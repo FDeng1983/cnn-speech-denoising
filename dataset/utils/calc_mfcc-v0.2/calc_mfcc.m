@@ -24,4 +24,4 @@ d = (32768*d);
 #writeasc(outfile, mfc');
 #writeasc(outfilespec, ps');
 
-save(outfilespec, 'ps');
+save("-hdf5", outfilespec, 'ps');
