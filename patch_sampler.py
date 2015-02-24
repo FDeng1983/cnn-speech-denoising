@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
 
     # the number of examples to write to the output hdf5 file before switching to a new one
-    max_examples_per_file = 100
+    max_examples_per_file = 2000
 
     times = 0
     data = None
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # change this to direct to the clean directory and the noisy directory
     clean_dir = 'spec/clean'
     noisy_dir = 'spec/isolated'
-    samples_per_spectrogram = 5 # how many samples to fetch from each spectrogram
+    samples_per_spectrogram = 15 # how many samples to fetch from each spectrogram
     sampler = PatchSampler(clean_dir, noisy_dir, samples_per_spectrogram)
 
     for noisy_path, clean_patch in sampler:
