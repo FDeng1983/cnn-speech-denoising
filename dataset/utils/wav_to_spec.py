@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import scipy.io.wavfile
+import matplotlib.cm as cm
 import numpy as np
 import sys
 import os
@@ -22,6 +23,9 @@ for fname in [f for f in os.listdir(directory) if f.endswith('.wav')]:
   wavfile = os.path.join(directory, fname)
 
   sr,x = scipy.io.wavfile.read(wavfile)
+
+  if(len(x.shape)>1 and x.shape[1]>1):
+    x = np.mean(x, axis=1)
 
   ## Parameters: 10ms step, 30ms window
   nstep = int(sr * 0.01)
@@ -46,9 +50,11 @@ for fname in [f for f in os.listdir(directory) if f.endswith('.wav')]:
   np.save(matfile, X)
 
   figfile = wavfile + '.png'
-  plt.imshow(X.T, interpolation='nearest',
-      origin='lower',
-      aspect='auto')
+  plt.imshow(-X.T, interpolation='nearest',
+             origin='lower',
+             aspect='auto',
+             cmap = cm.Greys_r
+           )
 
   plt.savefig(figfile)
   plt.close('all')
