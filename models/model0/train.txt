@@ -1,0 +1,1 @@
+/root/caffe/examples/hdf5_autoencoder/train.0.h5
