@@ -1,4 +1,4 @@
-net: "models/model0/auto_net.prototxt"
+net: "project/cnn-speech-denoising/models/model0/auto_net.prototxt"
 test_iter: 10
 test_interval: 50
 base_lr: 0.001
@@ -10,5 +10,5 @@ max_iter: 200
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 10000
-snapshot_prefix: "models/model0/data/train"
+snapshot_prefix: "project/cnn-speech-denoising/models/model0/snapshots/train"
 solver_mode: GPU

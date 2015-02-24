@@ -28,3 +28,6 @@
 *.app
 
 .idea/
+
+# data files
+*.h5
