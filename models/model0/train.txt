@@ -1,1 +1,1 @@
-/root/caffe/examples/hdf5_autoencoder/train.0.h5
+project/cnn-speech-denoising/dataset/train.0.h5
