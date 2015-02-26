@@ -31,3 +31,5 @@
 
 # data files
 *.h5
+
+snapshots/
