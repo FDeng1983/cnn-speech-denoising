@@ -4,23 +4,25 @@ import h5py
 
 class SpectrogramPair(object):
 
-    def __init__(self, noisy_mat, clean_mat):
+    def __init__(self, noisy_mat, clean_mat, num_samples):
         with h5py.File(noisy_mat, 'r') as f:
             self.noisy_mat = f['ps/value'].value
         with h5py.File(clean_mat, 'r') as f:
             self.clean_mat = f['ps/value'].value
+        self.num_samples = num_samples
 
     def sample_patch(self, y_len, x_len):
 
         y_max, x_max = self.clean_mat.shape
 
-        y_start = np.random.randint(low=0, high=y_max-y_len)
-        x_start = np.random.randint(low=0, high=x_max-x_len)
+        for i in xrange(self.num_samples):
+            y_start = np.random.randint(low=0, high=y_max-y_len)
+            x_start = np.random.randint(low=0, high=x_max-x_len)
 
-        clean_patch = self.clean_mat[y_start:y_start+y_len, x_start:x_start+x_len]
-        noisy_patch = self.noisy_mat[y_start:y_start+y_len, x_start:x_start+x_len]
+            clean_patch = self.clean_mat[y_start:y_start+y_len, x_start:x_start+x_len]
+            noisy_patch = self.noisy_mat[y_start:y_start+y_len, x_start:x_start+x_len]
 
-        yield noisy_patch.reshape(1, 1, y_len, x_len), clean_patch.reshape(1, 1, y_len, x_len)
+            yield noisy_patch.reshape(1, 1, y_len, x_len), clean_patch.reshape(1, 1, y_len, x_len)
 
 
 class PatchSampler(object):
@@ -41,7 +43,7 @@ class PatchSampler(object):
                 assert os.path.isfile(clean)
                 assert os.path.isfile(noisy)
 
-                pair = SpectrogramPair(noisy, clean)
+                pair = SpectrogramPair(noisy, clean, self.n)
                 for idx, patches in enumerate(pair.sample_patch(x_len=self.x_len, y_len=self.y_len)):
                     yield patches
 
@@ -63,17 +65,17 @@ if __name__ == '__main__':
 
 
     # the number of examples to write to the output hdf5 file before switching to a new one
-    max_examples_per_file = 100
+    max_examples_per_file = 2000
 
     times = 0
     data = None
     label = None
-    filename = 'train'
+    filename = 'output/train'
     filenum = 0
 
     # change this to direct to the clean directory and the noisy directory
-    clean_dir = 'spec/clean'
-    noisy_dir = 'spec/isolated'
+    clean_dir = 'dataset/aasp-chime-grid/train/clean/id1'
+    noisy_dir = 'dataset/aasp-chime-grid/train/isolated/id1'
     samples_per_spectrogram = 5 # how many samples to fetch from each spectrogram
     sampler = PatchSampler(clean_dir, noisy_dir, samples_per_spectrogram)
 
@@ -81,7 +83,7 @@ if __name__ == '__main__':
         times += 1
 
         data = noisy_path if data is None else np.concatenate((data, noisy_path), axis=0)
-        label = clean_patch if data is None else np.concatenate((data, clean_patch), axis=0)
+        label = clean_patch if label is None else np.concatenate((label, clean_patch), axis=0)
 
         if data.shape[0] == max_examples_per_file:
             # write a new file
