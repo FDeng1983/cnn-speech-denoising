@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 """ patch_sampler.py
 Usage:
-  patch_sampler.py <clean_dir> <noisy_dir> <output_dir> [--samples_per_spectrogram=<samples_per_spectrogram>]
-                                                        [--max_examples_per_file=<max_examples_per_file>]
-                                                        [--verbose]
+  patch_sampler.py  <root_dir>
+                    [--samples_per_spectrogram=<samples_per_spectrogram>]
+                    [--max_examples_per_file=<max_examples_per_file>]
+                    [--verbose]
 """
 
 import os
 import numpy as np
 import h5py
-import cPickle as pickle
+import cPickle as pkl
+
 
 class SpectrogramPair(object):
 
@@ -46,16 +48,16 @@ class PatchSampler(object):
 
     def __iter__(self):
         for root, dirs, files in os.walk(self.clean_dir, topdown=False):
+            if self.verbose:
+                print 'sampling from folder', root
+
             for name in files:
                 if not name.endswith('.hdf5'): continue
-                
+
                 clean = os.path.join(root, name)
                 noisy = clean.replace(self.clean_dir, self.noisy_dir)
                 assert os.path.isfile(clean)
                 assert os.path.isfile(noisy)
-
-                if self.verbose:
-                    print 'sampling from file', clean
 
                 pair = SpectrogramPair(noisy, clean, self.n)
                 for idx, patches in enumerate(pair.sample_patch(x_len=self.x_len, y_len=self.y_len)):
@@ -85,15 +87,17 @@ if __name__ == '__main__':
     samples_per_spectrogram = int(args.get('<samples_per_spectrogram>', 5))
 
     # where are the spectrograms
-    clean_dir = args['<clean_dir>']
-    noisy_dir = args['<noisy_dir>']    
-    out_dir = args['<output_dir>']
+    root = args['<root_dir>']
+    clean_dir = os.path.join(root, 'clean')
+    noisy_dir = os.path.join(root, 'noisy')
+    out_dir = os.path.join(root, 'sampled')
+    if not os.path.isdir(out_dir): os.makedirs(out_dir)
 
     def get_fname(filler, filenum):
         return os.path.join(out_dir, filler + '.' + str(filenum) + '.h5')
 
     sampler = PatchSampler(clean_dir, noisy_dir, samples_per_spectrogram, verbose=True if args['--verbose'] else False)
-    
+
     patches_sampled = 0; filenum = 0; total_patches_seen = 0
     noisy = None; clean = None; clean_mean = None; noisy_mean = None
     for noisy_patch, clean_patch in sampler:
