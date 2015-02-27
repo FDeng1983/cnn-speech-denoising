@@ -3,6 +3,10 @@
 ## Installation:
 
 ```bash
+pip install docopt numpy h5py
+```
+
+```bash
 cd ~/caffe # go to your caffe directory
 mkdir project
 cd project

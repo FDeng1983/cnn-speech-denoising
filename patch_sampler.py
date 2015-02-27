@@ -1,6 +1,15 @@
+#!/usr/bin/env python
+""" patch_sampler.py
+Usage:
+  patch_sampler.py <clean_dir> <noisy_dir> <output_dir> [--samples_per_spectrogram=<samples_per_spectrogram>]
+                                                        [--max_examples_per_file=<max_examples_per_file>]
+                                                        [--verbose]
+"""
+
 import os
 import numpy as np
 import h5py
+import cPickle as pickle
 
 class SpectrogramPair(object):
 
@@ -27,77 +36,95 @@ class SpectrogramPair(object):
 
 class PatchSampler(object):
 
-    def __init__(self, clean_dir, noisy_dir, samples_per_spectrogram=10, x_len=100, y_len=100):
+    def __init__(self, clean_dir, noisy_dir, samples_per_spectrogram=10, x_len=100, y_len=100, verbose=False):
         self.clean_dir = clean_dir
         self.noisy_dir = noisy_dir
         self.n = samples_per_spectrogram
         self.x_len = x_len
         self.y_len = y_len
+        self.verbose = verbose
 
     def __iter__(self):
         for root, dirs, files in os.walk(self.clean_dir, topdown=False):
             for name in files:
                 if not name.endswith('.hdf5'): continue
+                
                 clean = os.path.join(root, name)
                 noisy = clean.replace(self.clean_dir, self.noisy_dir)
                 assert os.path.isfile(clean)
                 assert os.path.isfile(noisy)
+
+                if self.verbose:
+                    print 'sampling from file', clean
 
                 pair = SpectrogramPair(noisy, clean, self.n)
                 for idx, patches in enumerate(pair.sample_patch(x_len=self.x_len, y_len=self.y_len)):
                     yield patches
 
 
-def write_out(data, label, fname):
+def write_out(data, fname):
 
     # HDF5 is pretty efficient, but can be further compressed.
     comp_kwargs = {'compression': 'gzip', 'compression_opts': 1}
     with h5py.File(fname, 'w') as f:
         f.create_dataset('data', data=data, **comp_kwargs)
-        f.create_dataset('label', data=label, **comp_kwargs)
-
-
-def get_fname(fname, fnum):
-    return filename+'.'+str(fnum)+'.h5'
 
 
 if __name__ == '__main__':
+    from docopt import docopt
+    args = docopt(__doc__)
 
+    from pprint import pprint
+    print 'User arguments:'
+    pprint(args)
 
     # the number of examples to write to the output hdf5 file before switching to a new one
-    max_examples_per_file = 2000
+    max_examples_per_file = int(args.get('<max_examples_per_file>', 1000))
 
-    times = 0
-    data = None
-    label = None
-    filename = 'output/train'
-    filenum = 0
+    # how many times to sample from a given spectrogram
+    samples_per_spectrogram = int(args.get('<samples_per_spectrogram>', 5))
 
-    # change this to direct to the clean directory and the noisy directory
-    clean_dir = 'dataset/aasp-chime-grid/train/clean/id1'
-    noisy_dir = 'dataset/aasp-chime-grid/train/isolated/id1'
-    samples_per_spectrogram = 5 # how many samples to fetch from each spectrogram
-    sampler = PatchSampler(clean_dir, noisy_dir, samples_per_spectrogram)
+    # where are the spectrograms
+    clean_dir = args['<clean_dir>']
+    noisy_dir = args['<noisy_dir>']    
+    out_dir = args['<output_dir>']
 
-    for noisy_path, clean_patch in sampler:
-        times += 1
+    def get_fname(filler, filenum):
+        return os.path.join(out_dir, filler + '.' + str(filenum) + '.h5')
 
-        data = noisy_path if data is None else np.concatenate((data, noisy_path), axis=0)
-        label = clean_patch if label is None else np.concatenate((label, clean_patch), axis=0)
+    sampler = PatchSampler(clean_dir, noisy_dir, samples_per_spectrogram, verbose=True if args['--verbose'] else False)
+    
+    patches_sampled = 0; filenum = 0; total_patches_seen = 0
+    noisy = None; clean = None; clean_mean = None; noisy_mean = None
+    for noisy_patch, clean_patch in sampler:
+        patches_sampled += 1
 
-        if data.shape[0] == max_examples_per_file:
+        # update the running means
+        clean_mean = clean_patch.copy() if clean_mean is None else (clean_mean * total_patches_seen + clean_patch) / float(total_patches_seen+1)
+        noisy_mean = noisy_patch.copy() if noisy_mean is None else (noisy_mean * total_patches_seen + noisy_patch) / float(total_patches_seen+1)
+
+        # concatenate the patches to buffer the write
+        noisy = noisy_patch if noisy is None else np.concatenate((noisy, noisy_patch), axis=0)
+        clean = clean_patch if clean is None else np.concatenate((clean, clean_patch), axis=0)
+
+        if patches_sampled == max_examples_per_file:
+            print 'writing out files', filenum
             # write a new file
-            print 'writing out', get_fname(filename, filenum)
-            write_out(data.astype('float32'), label.astype('float32'), get_fname(filename, filenum))
+            write_out(clean.astype('float32'), get_fname('clean', filenum))
+            write_out(noisy.astype('float32'), get_fname('noisy', filenum))
             filenum += 1
-            data = None
-            label = None
+            # empty buffers
+            data = None; label = None; patches_sampled = 0
 
-    if data is not None:
-        fname = filename+str(filenum)+'.h5'
-        print 'writing out', fname
-        write_out(data.astype('float32'), label.astype('float32'), fname)
-
-    with open(filename+'.txt', 'wb') as f:
+    # write out book keeping files
+    with open(os.path.join(out_dir, 'clean.txt'), 'wb') as f:
         for i in xrange(filenum):
-            f.write(get_fname(filename, i) + '\n')
+            f.write(get_fname('clean', i) + '\n')
+
+    with open(os.path.join(out_dir, 'noisy.txt'), 'wb') as f:
+        for i in xrange(filenum):
+            f.write(get_fname('noisy', i) + '\n')
+
+    # write out accumulated means
+    with open(os.path.join(out_dir, 'means.pkl'), 'wb') as f:
+        pkl.dump({'clean': clean_mean, 'noisy': noisy_mean}, f)
