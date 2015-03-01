@@ -34,3 +34,7 @@
 
 snapshots/
 sftp-config.json
+
+out/
+spec/
+dataset/
