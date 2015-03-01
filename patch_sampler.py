@@ -81,10 +81,16 @@ if __name__ == '__main__':
     pprint(args)
 
     # the number of examples to write to the output hdf5 file before switching to a new one
-    max_examples_per_file = int(args.get('<max_examples_per_file>', 1000))
+    if args['--max_examples_per_file']:
+        max_examples_per_file = int(args['--max_examples_per_file'])
+    else:
+        max_examples_per_file = 1000
 
     # how many times to sample from a given spectrogram
-    samples_per_spectrogram = int(args.get('<samples_per_spectrogram>', 5))
+    if args['--samples_per_spectrogram']:
+        samples_per_spectrogram = int(args['--samples_per_spectrogram'])
+    else:
+        samples_per_spectrogram = 5
 
     # where are the spectrograms
     root = args['<root_dir>']

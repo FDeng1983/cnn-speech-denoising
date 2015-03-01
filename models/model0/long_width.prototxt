@@ -4,12 +4,11 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/models/model0/train.txt"
+    source: "project/cnn-speech-denoising/dataset/dev/normalized/filelist.txt"
     batch_size: 50
   }
   include: { phase: TRAIN }
 }
-
 
 layers {
   name: "data"
@@ -17,7 +16,7 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/models/model0/train.txt"
+    source: "project/cnn-speech-denoising/dataset/dev/normalized/filelist.txt"
     batch_size: 50
   }
   include: { phase: TEST }
