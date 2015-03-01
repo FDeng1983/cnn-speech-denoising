@@ -64,13 +64,13 @@ class PatchSampler(object):
                     yield patches
 
 
-def write_out(data, fname):
+def write_out(data, label, fname):
 
     # HDF5 is pretty efficient, but can be further compressed.
     comp_kwargs = {'compression': 'gzip', 'compression_opts': 1}
     with h5py.File(fname, 'w') as f:
         f.create_dataset('data', data=data, **comp_kwargs)
-
+        f.create_dataset('label', data=label, **comp_kwargs)
 
 if __name__ == '__main__':
     from docopt import docopt
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     out_dir = os.path.join(root, 'sampled')
     if not os.path.isdir(out_dir): os.makedirs(out_dir)
 
-    def get_fname(filler, filenum):
-        return os.path.join(out_dir, filler + '.' + str(filenum) + '.h5')
+    def get_fname(filenum):
+        return os.path.join(out_dir, 'file.' + str(filenum) + '.h5')
 
     sampler = PatchSampler(clean_dir, noisy_dir, samples_per_spectrogram, verbose=True if args['--verbose'] else False)
 
@@ -114,20 +114,15 @@ if __name__ == '__main__':
         if patches_sampled == max_examples_per_file:
             print 'writing out files', filenum
             # write a new file
-            write_out(clean.astype('float32'), get_fname('clean', filenum))
-            write_out(noisy.astype('float32'), get_fname('noisy', filenum))
+            write_out(noisy.astype('float32'), clean.astype('float32'), get_fname(filenum))
             filenum += 1
             # empty buffers
             data = None; label = None; patches_sampled = 0
 
     # write out book keeping files
-    with open(os.path.join(out_dir, 'clean.txt'), 'wb') as f:
+    with open(os.path.join(out_dir, 'filelist.txt'), 'wb') as f:
         for i in xrange(filenum):
-            f.write(get_fname('clean', i) + '\n')
-
-    with open(os.path.join(out_dir, 'noisy.txt'), 'wb') as f:
-        for i in xrange(filenum):
-            f.write(get_fname('noisy', i) + '\n')
+            f.write(get_fname(i) + '\n')
 
     # write out accumulated means
     with open(os.path.join(out_dir, 'means.pkl'), 'wb') as f:
