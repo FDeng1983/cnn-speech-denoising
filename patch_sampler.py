@@ -123,7 +123,7 @@ if __name__ == '__main__':
             write_out(noisy.astype('float32'), clean.astype('float32'), get_fname(filenum))
             filenum += 1
             # empty buffers
-            data = None; label = None; patches_sampled = 0
+            noisy = None; clean = None; patches_sampled = 0
 
     # write out book keeping files
     with open(os.path.join(out_dir, 'filelist.txt'), 'wb') as f:

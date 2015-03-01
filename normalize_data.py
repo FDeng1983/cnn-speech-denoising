@@ -34,7 +34,7 @@ if __name__ == '__main__':
     for fname in os.listdir(args['<in_dir>']):
         if fname.endswith('.h5'):
             in_fname = os.path.join(args['<in_dir>'], fname)
-            out_fname = in_fname.replace(args['<in_dir>'], args['<out_dir>'])
+            out_fname = in_fname.replace(args['<in_dir>'].rstrip('/'), args['<out_dir>'].rstrip('/'))
             if verbose:
                 print 'processing file', in_fname + '...',
             in_file = h5py.File(in_fname, 'r')
