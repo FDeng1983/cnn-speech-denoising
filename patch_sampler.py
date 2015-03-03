@@ -5,8 +5,6 @@ Usage:
                     [--samples_per_spectrogram=<samples_per_spectrogram>]
                     [--verbose]
                     [--x_len=<20>]
-                    [--max_mfcc=inf]
-                    [--min_mfcc=-inf]
                     [--scale_mfcc=1]
                     [--normalize_spec]
 """
@@ -45,6 +43,9 @@ class SpectrogramMFCC(object):
             spec_patch = self.spec_mat[x_start:x_start+x_len, :]
 
             assert mfcc_patch.shape == (spec_patch.shape[0], 39)
+
+            assert mfcc_patch.max() < 100
+            assert mfcc_patch.min() > -100
 
             yield spec_patch.reshape(1, 1, -1, x_len), mfcc_patch.reshape(1, 1, -1, x_len)
 
@@ -93,8 +94,6 @@ if __name__ == '__main__':
 
     default('--x_len', int, 20)
     default('--samples_per_spectrogram', int, 5)
-    default('--max_mfcc', float, np.inf)
-    default('--min_mfcc', float, -np.inf)
     default('--scale_mfcc', float, 1)
 
     from pprint import pprint
@@ -126,7 +125,9 @@ if __name__ == '__main__':
     spec = np.concatenate(spec, axis=0)
     mfcc = np.concatenate(mfcc, axis=0)
 
-    mfcc.clip(args['--min_mfcc'], args['--max_mfcc'])
+    assert mfcc.max() < 100
+    print 'observed maximum', mfcc.max(), 'minimum', mfcc.min()
+
     mfcc *= args['--scale_mfcc']
 
     if args['--normalize_spec']:
