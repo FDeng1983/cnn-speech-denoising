@@ -34,3 +34,5 @@
 
 snapshots/
 sftp-config.json
+.ipynb_checkpoints/
+dataset/
