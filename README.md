@@ -4,6 +4,7 @@
 
 ```bash
 pip install docopt numpy h5py
+# you also need to install caffe to ~/caffe
 ```
 
 ```bash
@@ -13,8 +14,17 @@ cd project
 git clone https://github.com/vzhong/cnn-speech-denoising.git
 ```
 
+## Dataset
+
+This will give you the raw dataset we used, as well as the train/dev splits and sample patches we feed into the convnet.
+```bash
+cd cnn-speech-denoising/dataset
+scp -r USERNAME@corn.stanford.edu:/scr/vzhong/cnn-speech-denoising/dataset/mfcc .
+```
+
 ## Training:
 
 ```bash
-./project/cnn-speech-denoising/models/model0/train.sh
+# edit run.sh to reflect your configuration
+./run.sh
 ```
