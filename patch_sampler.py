@@ -5,6 +5,8 @@ Usage:
                     [--samples_per_spectrogram=<samples_per_spectrogram>]
                     [--max_examples_per_file=<max_examples_per_file>]
                     [--verbose]
+                    [--x_len=<100>]
+                    [--scale=<1e-5>]
 """
 
 import os
@@ -84,6 +86,10 @@ if __name__ == '__main__':
     from docopt import docopt
     args = docopt(__doc__)
 
+    args['--x_len'] = int(args['--x_len']) if args['--x_len'] else 20
+    args['--scale'] = float(args['--scale']) if args['--scale'] else 1
+    args['--verbose'] = True if args['--verbose'] else False
+
     from pprint import pprint
     print 'User arguments:'
     pprint(args)
@@ -110,12 +116,18 @@ if __name__ == '__main__':
     def get_fname(filenum):
         return os.path.join(out_dir, 'file.' + str(filenum) + '.h5')
 
-    sampler = PatchSampler(spec_dir, mfcc_dir, samples_per_spectrogram, verbose=True if args['--verbose'] else False)
+    sampler = PatchSampler(spec_dir, mfcc_dir, samples_per_spectrogram, 
+        verbose=args['--verbose'],
+        x_len=args['--x_len'])
 
     patches_sampled = 0; filenum = 0; total_patches_seen = 0
     spec = None; mfcc = None; mfcc_mean = None; spec_mean = None
     for spec_patch, mfcc_patch in sampler:
         patches_sampled += 1
+
+        # scale if requested
+        spec_patch *= args['--scale']
+        mfcc_patch *= args['--scale']
 
         # update the running means
         mfcc_mean = mfcc_patch.copy() if mfcc_mean is None else (mfcc_mean * total_patches_seen + mfcc_patch) / float(total_patches_seen+1)
@@ -136,7 +148,7 @@ if __name__ == '__main__':
     # write out book keeping files
     with open(os.path.join(out_dir, 'filelist.txt'), 'wb') as f:
         for i in xrange(filenum):
-            f.write(get_fname(i) + '\n')
+            f.write('project/cnn-speech-denoising/' + get_fname(i) + '\n')
 
     # write out accumulated means
     with open(os.path.join(out_dir, 'means.pkl'), 'wb') as f:
