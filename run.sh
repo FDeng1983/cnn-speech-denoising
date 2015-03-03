@@ -36,6 +36,7 @@ cd_caffe() {
 }
 
 split() {
+    echo Splitting dataset to $SPLITLOG
     cd_proj
 
     # do a 70/30 split on the ${DATASET} dataset in to train and dev
@@ -43,6 +44,7 @@ split() {
 }
 
 sample() {
+    echo Sampling dataset to $SAMPLELOG
     cd_proj
 
     # sample the training data, normalize and dump the normalization params to disk
@@ -53,6 +55,7 @@ sample() {
 }
 
 train() {
+    echo Training caffe to $CAFFELOG
     cd_caffe
 
     ./build/tools/caffe train \
@@ -65,16 +68,11 @@ train() {
 
 mkdir -p $LOGDIR
 
-echo Splitting dataset to $SPLITLOG
+# These two are destructive in that they are stochastic and will overwrite your splits and samples
+# split
+# sample
 
-split
-
-echo Sampling dataset to $SAMPLELOG
-
-sample
-
-echo Training caffe to $CAFFELOG
-
+# This trains caffe
 train
 
 success
