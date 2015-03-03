@@ -11,9 +11,9 @@ LOGDIR=~/caffe/log
 
 NET=$DATASET
 
-SPLITLOG=${LOGDIR}/split.log
-SAMPLELOG=${LOGDIR}/sample.log
-CAFFELOG=${LOGDIR}/caffe.log
+SPLITLOG=${LOGDIR}/${DATASET}.split.log
+SAMPLELOG=${LOGDIR}/${DATASET}.sample.log
+CAFFELOG=${LOGDIR}/${DATASET}.caffe.log
 
 STARTDIR=$PWD
 
