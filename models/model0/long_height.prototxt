@@ -145,6 +145,6 @@ layers {
   bottom: "flat"
   top: "l2_error"
   name: "loss"
-  type: EUCLIDEAN_LOSS
+  type: HINGE_LOSS
   loss_weight: 1.
 }
