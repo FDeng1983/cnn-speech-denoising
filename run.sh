@@ -3,7 +3,7 @@
 ### Define your parameters here:
 
 CAFFEDIR=~/caffe
-DATASET=clean
+DATASET=noisy
 
 LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
 
