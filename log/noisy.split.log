@@ -1,0 +1,12 @@
+User arguments
+{'--train_portion': '0.7',
+ '<root_dir>': 'dataset/mfcc/noisy'}
+removing directory dataset/mfcc/noisy/train for resampling
+removing directory dataset/mfcc/noisy/dev for resampling
+making directory dataset/mfcc/noisy/train
+making directory dataset/mfcc/noisy/dev
+making directory dataset/mfcc/noisy/train/spec
+making directory dataset/mfcc/noisy/train/mfcc
+making directory dataset/mfcc/noisy/dev/spec
+making directory dataset/mfcc/noisy/dev/mfcc
+350 out of 500 files will be used for training

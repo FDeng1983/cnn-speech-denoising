@@ -1,0 +1,25 @@
+User arguments:
+{'--dev': False,
+ '--normalize_spec': 'dataset/mfcc/noisy/trained_normalization_params.pkl',
+ '--samples_per_file': '5',
+ '--scale_mfcc': '1e-2',
+ '--verbose': False,
+ '--x_len': '20',
+ '<root_dir>': 'dataset/mfcc/noisy/train'}
+observed mfcc maximum 78.3004728515 minimum -67.0086925483
+calculating mean and std from data
+saving normalization paramters to dataset/mfcc/noisy/trained_normalization_params.pkl
+normalizing spectrograms
+writing out files
+User arguments:
+{'--dev': True,
+ '--normalize_spec': 'dataset/mfcc/noisy/trained_normalization_params.pkl',
+ '--samples_per_file': '5',
+ '--scale_mfcc': '1e-2',
+ '--verbose': False,
+ '--x_len': '20',
+ '<root_dir>': 'dataset/mfcc/noisy/dev'}
+observed mfcc maximum 73.016798854 minimum -67.780258369
+loading PREXISTING mean and std from dataset/mfcc/noisy/trained_normalization_params.pkl
+normalizing spectrograms
+writing out files

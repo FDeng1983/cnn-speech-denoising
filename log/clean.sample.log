@@ -1,0 +1,25 @@
+User arguments:
+{'--dev': False,
+ '--normalize_spec': 'dataset/mfcc/clean/trained_normalization_params.pkl',
+ '--samples_per_file': '5',
+ '--scale_mfcc': '1e-2',
+ '--verbose': False,
+ '--x_len': '20',
+ '<root_dir>': 'dataset/mfcc/clean/train'}
+observed mfcc maximum 68.342636219 minimum -67.4460172749
+calculating mean and std from data
+saving normalization paramters to dataset/mfcc/clean/trained_normalization_params.pkl
+normalizing spectrograms
+writing out files
+User arguments:
+{'--dev': True,
+ '--normalize_spec': 'dataset/mfcc/clean/trained_normalization_params.pkl',
+ '--samples_per_file': '5',
+ '--scale_mfcc': '1e-2',
+ '--verbose': False,
+ '--x_len': '20',
+ '<root_dir>': 'dataset/mfcc/clean/dev'}
+observed mfcc maximum 65.7140112868 minimum -68.329679691
+loading PREXISTING mean and std from dataset/mfcc/clean/trained_normalization_params.pkl
+normalizing spectrograms
+writing out files

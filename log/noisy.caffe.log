@@ -1,0 +1,511 @@
+I0303 12:45:50.003526 26781 caffe.cpp:99] Use GPU with device ID 0
+I0303 12:45:50.097865 26781 caffe.cpp:107] Starting Optimization
+I0303 12:45:50.097998 26781 solver.cpp:32] Initializing solver from parameters: 
+test_iter: 10
+test_interval: 10
+base_lr: 1e-05
+display: 10
+max_iter: 50
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.0005
+stepsize: 20
+snapshot: 10
+snapshot_prefix: "project/cnn-speech-denoising/models/model0/snapshots/noisy"
+solver_mode: GPU
+net: "project/cnn-speech-denoising/models/model0/noisy.prototxt"
+solver_type: NESTEROV
+I0303 12:45:50.098023 26781 solver.cpp:70] Creating training net from net file: project/cnn-speech-denoising/models/model0/noisy.prototxt
+E0303 12:45:50.098235 26781 upgrade_proto.cpp:618] Attempting to upgrade input file specified using deprecated V1LayerParameter: project/cnn-speech-denoising/models/model0/noisy.prototxt
+I0303 12:45:50.098336 26781 upgrade_proto.cpp:626] Successfully upgraded file specified using deprecated V1LayerParameter
+I0303 12:45:50.098376 26781 net.cpp:253] The NetState phase (0) differed from the phase (1) specified by a rule in layer data
+I0303 12:45:50.098471 26781 net.cpp:42] Initializing net from parameters: 
+state {
+  phase: TRAIN
+}
+layer {
+  name: "data"
+  type: "HDF5Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  hdf5_data_param {
+    source: "project/cnn-speech-denoising/dataset/mfcc/noisy/train/sampled/filelist.txt"
+    batch_size: 50
+  }
+}
+layer {
+  name: "flat"
+  type: "Flatten"
+  bottom: "label"
+  top: "flat"
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 4
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+    pad_h: 38
+    pad_w: 2
+    kernel_h: 39
+    kernel_w: 5
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "relu1"
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "relu1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 8
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+    pad_h: 38
+    pad_w: 2
+    kernel_h: 39
+    kernel_w: 5
+  }
+}
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "conv2"
+  top: "relu2"
+}
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "relu2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 2
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+    pad_h: 38
+    pad_w: 2
+    kernel_h: 39
+    kernel_w: 5
+  }
+}
+layer {
+  name: "fc"
+  type: "InnerProduct"
+  bottom: "conv3"
+  top: "fc"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 780
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "HingeLoss"
+  bottom: "fc"
+  bottom: "flat"
+  top: "l1_error"
+  loss_weight: 1
+}
+I0303 12:45:50.098522 26781 layer_factory.hpp:74] Creating layer data
+I0303 12:45:50.098532 26781 net.cpp:76] Creating Layer data
+I0303 12:45:50.098537 26781 net.cpp:334] data -> data
+I0303 12:45:50.098551 26781 net.cpp:334] data -> label
+I0303 12:45:50.098561 26781 net.cpp:105] Setting up data
+I0303 12:45:50.098564 26781 hdf5_data_layer.cpp:66] Loading list of HDF5 filenames from: project/cnn-speech-denoising/dataset/mfcc/noisy/train/sampled/filelist.txt
+I0303 12:45:50.098608 26781 hdf5_data_layer.cpp:80] Number of HDF5 files: 1
+I0303 12:45:50.392150 26781 net.cpp:112] Top shape: 50 1 257 20 (257000)
+I0303 12:45:50.392182 26781 net.cpp:112] Top shape: 50 1 39 20 (39000)
+I0303 12:45:50.392209 26781 layer_factory.hpp:74] Creating layer flat
+I0303 12:45:50.392220 26781 net.cpp:76] Creating Layer flat
+I0303 12:45:50.392226 26781 net.cpp:372] flat <- label
+I0303 12:45:50.392256 26781 net.cpp:334] flat -> flat
+I0303 12:45:50.392271 26781 net.cpp:105] Setting up flat
+I0303 12:45:50.392277 26781 net.cpp:112] Top shape: 50 780 1 1 (39000)
+I0303 12:45:50.392280 26781 layer_factory.hpp:74] Creating layer conv1
+I0303 12:45:50.392288 26781 net.cpp:76] Creating Layer conv1
+I0303 12:45:50.392292 26781 net.cpp:372] conv1 <- data
+I0303 12:45:50.392297 26781 net.cpp:334] conv1 -> conv1
+I0303 12:45:50.392303 26781 net.cpp:105] Setting up conv1
+I0303 12:45:50.392663 26781 net.cpp:112] Top shape: 50 4 295 20 (1180000)
+I0303 12:45:50.392680 26781 layer_factory.hpp:74] Creating layer relu1
+I0303 12:45:50.392688 26781 net.cpp:76] Creating Layer relu1
+I0303 12:45:50.392691 26781 net.cpp:372] relu1 <- conv1
+I0303 12:45:50.392696 26781 net.cpp:334] relu1 -> relu1
+I0303 12:45:50.392701 26781 net.cpp:105] Setting up relu1
+I0303 12:45:50.392705 26781 net.cpp:112] Top shape: 50 4 295 20 (1180000)
+I0303 12:45:50.392709 26781 layer_factory.hpp:74] Creating layer conv2
+I0303 12:45:50.392716 26781 net.cpp:76] Creating Layer conv2
+I0303 12:45:50.392719 26781 net.cpp:372] conv2 <- relu1
+I0303 12:45:50.392724 26781 net.cpp:334] conv2 -> conv2
+I0303 12:45:50.392729 26781 net.cpp:105] Setting up conv2
+I0303 12:45:50.392772 26781 net.cpp:112] Top shape: 50 8 333 20 (2664000)
+I0303 12:45:50.392781 26781 layer_factory.hpp:74] Creating layer relu2
+I0303 12:45:50.392794 26781 net.cpp:76] Creating Layer relu2
+I0303 12:45:50.392797 26781 net.cpp:372] relu2 <- conv2
+I0303 12:45:50.392802 26781 net.cpp:334] relu2 -> relu2
+I0303 12:45:50.392815 26781 net.cpp:105] Setting up relu2
+I0303 12:45:50.392818 26781 net.cpp:112] Top shape: 50 8 333 20 (2664000)
+I0303 12:45:50.392822 26781 layer_factory.hpp:74] Creating layer conv3
+I0303 12:45:50.392827 26781 net.cpp:76] Creating Layer conv3
+I0303 12:45:50.392830 26781 net.cpp:372] conv3 <- relu2
+I0303 12:45:50.392835 26781 net.cpp:334] conv3 -> conv3
+I0303 12:45:50.392839 26781 net.cpp:105] Setting up conv3
+I0303 12:45:50.392866 26781 net.cpp:112] Top shape: 50 2 371 20 (742000)
+I0303 12:45:50.392874 26781 layer_factory.hpp:74] Creating layer fc
+I0303 12:45:50.392879 26781 net.cpp:76] Creating Layer fc
+I0303 12:45:50.392884 26781 net.cpp:372] fc <- conv3
+I0303 12:45:50.392887 26781 net.cpp:334] fc -> fc
+I0303 12:45:50.392894 26781 net.cpp:105] Setting up fc
+I0303 12:45:50.499876 26781 net.cpp:112] Top shape: 50 780 1 1 (39000)
+I0303 12:45:50.499900 26781 layer_factory.hpp:74] Creating layer loss
+I0303 12:45:50.499928 26781 net.cpp:76] Creating Layer loss
+I0303 12:45:50.499934 26781 net.cpp:372] loss <- fc
+I0303 12:45:50.499948 26781 net.cpp:372] loss <- flat
+I0303 12:45:50.499955 26781 net.cpp:334] loss -> l1_error
+I0303 12:45:50.499963 26781 net.cpp:105] Setting up loss
+I0303 12:45:50.499969 26781 net.cpp:112] Top shape: 1 1 1 1 (1)
+I0303 12:45:50.499972 26781 net.cpp:118]     with loss weight 1
+I0303 12:45:50.499994 26781 net.cpp:163] loss needs backward computation.
+I0303 12:45:50.499999 26781 net.cpp:163] fc needs backward computation.
+I0303 12:45:50.500001 26781 net.cpp:163] conv3 needs backward computation.
+I0303 12:45:50.500005 26781 net.cpp:163] relu2 needs backward computation.
+I0303 12:45:50.500008 26781 net.cpp:163] conv2 needs backward computation.
+I0303 12:45:50.500012 26781 net.cpp:163] relu1 needs backward computation.
+I0303 12:45:50.500015 26781 net.cpp:163] conv1 needs backward computation.
+I0303 12:45:50.500020 26781 net.cpp:165] flat does not need backward computation.
+I0303 12:45:50.500023 26781 net.cpp:165] data does not need backward computation.
+I0303 12:45:50.500026 26781 net.cpp:201] This network produces output l1_error
+I0303 12:45:50.500036 26781 net.cpp:446] Collecting Learning Rate and Weight Decay.
+I0303 12:45:50.500043 26781 net.cpp:213] Network initialization done.
+I0303 12:45:50.500046 26781 net.cpp:214] Memory required for data: 35216004
+E0303 12:45:50.500311 26781 upgrade_proto.cpp:618] Attempting to upgrade input file specified using deprecated V1LayerParameter: project/cnn-speech-denoising/models/model0/noisy.prototxt
+I0303 12:45:50.500358 26781 upgrade_proto.cpp:626] Successfully upgraded file specified using deprecated V1LayerParameter
+I0303 12:45:50.500376 26781 solver.cpp:154] Creating test net (#0) specified by net file: project/cnn-speech-denoising/models/model0/noisy.prototxt
+I0303 12:45:50.500391 26781 net.cpp:253] The NetState phase (1) differed from the phase (0) specified by a rule in layer data
+I0303 12:45:50.500489 26781 net.cpp:42] Initializing net from parameters: 
+state {
+  phase: TEST
+}
+layer {
+  name: "data"
+  type: "HDF5Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  hdf5_data_param {
+    source: "project/cnn-speech-denoising/dataset/mfcc/noisy/dev/sampled/filelist.txt"
+    batch_size: 50
+  }
+}
+layer {
+  name: "flat"
+  type: "Flatten"
+  bottom: "label"
+  top: "flat"
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 4
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+    pad_h: 38
+    pad_w: 2
+    kernel_h: 39
+    kernel_w: 5
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "relu1"
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "relu1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 8
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+    pad_h: 38
+    pad_w: 2
+    kernel_h: 39
+    kernel_w: 5
+  }
+}
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "conv2"
+  top: "relu2"
+}
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "relu2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 2
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+    pad_h: 38
+    pad_w: 2
+    kernel_h: 39
+    kernel_w: 5
+  }
+}
+layer {
+  name: "fc"
+  type: "InnerProduct"
+  bottom: "conv3"
+  top: "fc"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 780
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "HingeLoss"
+  bottom: "fc"
+  bottom: "flat"
+  top: "l1_error"
+  loss_weight: 1
+}
+I0303 12:45:50.500525 26781 layer_factory.hpp:74] Creating layer data
+I0303 12:45:50.500533 26781 net.cpp:76] Creating Layer data
+I0303 12:45:50.500538 26781 net.cpp:334] data -> data
+I0303 12:45:50.500545 26781 net.cpp:334] data -> label
+I0303 12:45:50.500550 26781 net.cpp:105] Setting up data
+I0303 12:45:50.500555 26781 hdf5_data_layer.cpp:66] Loading list of HDF5 filenames from: project/cnn-speech-denoising/dataset/mfcc/noisy/dev/sampled/filelist.txt
+I0303 12:45:50.500573 26781 hdf5_data_layer.cpp:80] Number of HDF5 files: 1
+I0303 12:45:50.628301 26781 net.cpp:112] Top shape: 50 1 257 20 (257000)
+I0303 12:45:50.628332 26781 net.cpp:112] Top shape: 50 1 39 20 (39000)
+I0303 12:45:50.628356 26781 layer_factory.hpp:74] Creating layer flat
+I0303 12:45:50.628368 26781 net.cpp:76] Creating Layer flat
+I0303 12:45:50.628373 26781 net.cpp:372] flat <- label
+I0303 12:45:50.628381 26781 net.cpp:334] flat -> flat
+I0303 12:45:50.628397 26781 net.cpp:105] Setting up flat
+I0303 12:45:50.628402 26781 net.cpp:112] Top shape: 50 780 1 1 (39000)
+I0303 12:45:50.628407 26781 layer_factory.hpp:74] Creating layer conv1
+I0303 12:45:50.628413 26781 net.cpp:76] Creating Layer conv1
+I0303 12:45:50.628417 26781 net.cpp:372] conv1 <- data
+I0303 12:45:50.628422 26781 net.cpp:334] conv1 -> conv1
+I0303 12:45:50.628428 26781 net.cpp:105] Setting up conv1
+I0303 12:45:50.628449 26781 net.cpp:112] Top shape: 50 4 295 20 (1180000)
+I0303 12:45:50.628460 26781 layer_factory.hpp:74] Creating layer relu1
+I0303 12:45:50.628466 26781 net.cpp:76] Creating Layer relu1
+I0303 12:45:50.628469 26781 net.cpp:372] relu1 <- conv1
+I0303 12:45:50.628482 26781 net.cpp:334] relu1 -> relu1
+I0303 12:45:50.628494 26781 net.cpp:105] Setting up relu1
+I0303 12:45:50.628499 26781 net.cpp:112] Top shape: 50 4 295 20 (1180000)
+I0303 12:45:50.628502 26781 layer_factory.hpp:74] Creating layer conv2
+I0303 12:45:50.628509 26781 net.cpp:76] Creating Layer conv2
+I0303 12:45:50.628512 26781 net.cpp:372] conv2 <- relu1
+I0303 12:45:50.628517 26781 net.cpp:334] conv2 -> conv2
+I0303 12:45:50.628522 26781 net.cpp:105] Setting up conv2
+I0303 12:45:50.628566 26781 net.cpp:112] Top shape: 50 8 333 20 (2664000)
+I0303 12:45:50.628573 26781 layer_factory.hpp:74] Creating layer relu2
+I0303 12:45:50.628578 26781 net.cpp:76] Creating Layer relu2
+I0303 12:45:50.628582 26781 net.cpp:372] relu2 <- conv2
+I0303 12:45:50.628586 26781 net.cpp:334] relu2 -> relu2
+I0303 12:45:50.628590 26781 net.cpp:105] Setting up relu2
+I0303 12:45:50.628594 26781 net.cpp:112] Top shape: 50 8 333 20 (2664000)
+I0303 12:45:50.628597 26781 layer_factory.hpp:74] Creating layer conv3
+I0303 12:45:50.628604 26781 net.cpp:76] Creating Layer conv3
+I0303 12:45:50.628608 26781 net.cpp:372] conv3 <- relu2
+I0303 12:45:50.628613 26781 net.cpp:334] conv3 -> conv3
+I0303 12:45:50.628618 26781 net.cpp:105] Setting up conv3
+I0303 12:45:50.628645 26781 net.cpp:112] Top shape: 50 2 371 20 (742000)
+I0303 12:45:50.628653 26781 layer_factory.hpp:74] Creating layer fc
+I0303 12:45:50.628659 26781 net.cpp:76] Creating Layer fc
+I0303 12:45:50.628664 26781 net.cpp:372] fc <- conv3
+I0303 12:45:50.628669 26781 net.cpp:334] fc -> fc
+I0303 12:45:50.628674 26781 net.cpp:105] Setting up fc
+I0303 12:45:50.735455 26781 net.cpp:112] Top shape: 50 780 1 1 (39000)
+I0303 12:45:50.735504 26781 layer_factory.hpp:74] Creating layer loss
+I0303 12:45:50.735515 26781 net.cpp:76] Creating Layer loss
+I0303 12:45:50.735522 26781 net.cpp:372] loss <- fc
+I0303 12:45:50.735537 26781 net.cpp:372] loss <- flat
+I0303 12:45:50.735543 26781 net.cpp:334] loss -> l1_error
+I0303 12:45:50.735550 26781 net.cpp:105] Setting up loss
+I0303 12:45:50.735555 26781 net.cpp:112] Top shape: 1 1 1 1 (1)
+I0303 12:45:50.735558 26781 net.cpp:118]     with loss weight 1
+I0303 12:45:50.735570 26781 net.cpp:163] loss needs backward computation.
+I0303 12:45:50.735574 26781 net.cpp:163] fc needs backward computation.
+I0303 12:45:50.735579 26781 net.cpp:163] conv3 needs backward computation.
+I0303 12:45:50.735582 26781 net.cpp:163] relu2 needs backward computation.
+I0303 12:45:50.735586 26781 net.cpp:163] conv2 needs backward computation.
+I0303 12:45:50.735590 26781 net.cpp:163] relu1 needs backward computation.
+I0303 12:45:50.735594 26781 net.cpp:163] conv1 needs backward computation.
+I0303 12:45:50.735599 26781 net.cpp:165] flat does not need backward computation.
+I0303 12:45:50.735602 26781 net.cpp:165] data does not need backward computation.
+I0303 12:45:50.735606 26781 net.cpp:201] This network produces output l1_error
+I0303 12:45:50.735615 26781 net.cpp:446] Collecting Learning Rate and Weight Decay.
+I0303 12:45:50.735621 26781 net.cpp:213] Network initialization done.
+I0303 12:45:50.735625 26781 net.cpp:214] Memory required for data: 35216004
+I0303 12:45:50.735687 26781 solver.cpp:42] Solver scaffolding done.
+I0303 12:45:50.735704 26781 solver.cpp:222] Solving 
+I0303 12:45:50.735719 26781 solver.cpp:223] Learning Rate Policy: step
+I0303 12:45:50.735725 26781 solver.cpp:266] Iteration 0, Testing net (#0)
+I0303 12:45:52.572422 26781 solver.cpp:315]     Test net output #0: l1_error = 789.092 (* 1 = 789.092 loss)
+I0303 12:45:53.119791 26781 solver.cpp:189] Iteration 0, loss = 789.109
+I0303 12:45:53.119827 26781 solver.cpp:204]     Train net output #0: l1_error = 789.109 (* 1 = 789.109 loss)
+I0303 12:45:53.119858 26781 solver.cpp:585] Iteration 0, lr = 1e-05
+I0303 12:45:58.138145 26781 solver.cpp:334] Snapshotting to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_10.caffemodel
+I0303 12:45:58.249168 26781 solver.cpp:342] Snapshotting solver state to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_10.solverstate
+I0303 12:45:58.335531 26781 solver.cpp:266] Iteration 10, Testing net (#0)
+I0303 12:46:00.135457 26781 solver.cpp:315]     Test net output #0: l1_error = 750.974 (* 1 = 750.974 loss)
+I0303 12:46:00.681200 26781 solver.cpp:189] Iteration 10, loss = 746.497
+I0303 12:46:00.681236 26781 solver.cpp:204]     Train net output #0: l1_error = 746.497 (* 1 = 746.497 loss)
+I0303 12:46:00.681262 26781 solver.cpp:585] Iteration 10, lr = 1e-05
+I0303 12:46:05.694845 26781 solver.cpp:334] Snapshotting to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_20.caffemodel
+I0303 12:46:05.800282 26781 solver.cpp:342] Snapshotting solver state to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_20.solverstate
+I0303 12:46:05.898658 26781 solver.cpp:266] Iteration 20, Testing net (#0)
+I0303 12:46:07.693724 26781 solver.cpp:315]     Test net output #0: l1_error = 7.16153 (* 1 = 7.16153 loss)
+I0303 12:46:08.238265 26781 solver.cpp:189] Iteration 20, loss = 1.57676
+I0303 12:46:08.238301 26781 solver.cpp:204]     Train net output #0: l1_error = 1.57676 (* 1 = 1.57676 loss)
+I0303 12:46:08.238327 26781 solver.cpp:585] Iteration 20, lr = 1e-06
+I0303 12:46:13.252241 26781 solver.cpp:334] Snapshotting to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_30.caffemodel
+I0303 12:46:13.357388 26781 solver.cpp:342] Snapshotting solver state to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_30.solverstate
+I0303 12:46:13.585942 26781 solver.cpp:266] Iteration 30, Testing net (#0)
+I0303 12:46:15.384904 26781 solver.cpp:315]     Test net output #0: l1_error = 0.725746 (* 1 = 0.725746 loss)
+I0303 12:46:15.929872 26781 solver.cpp:189] Iteration 30, loss = -2.76417e-06
+I0303 12:46:15.929903 26781 solver.cpp:204]     Train net output #0: l1_error = 0 (* 1 = 0 loss)
+I0303 12:46:15.929929 26781 solver.cpp:585] Iteration 30, lr = 1e-06
+I0303 12:46:20.944897 26781 solver.cpp:334] Snapshotting to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_40.caffemodel
+I0303 12:46:21.049896 26781 solver.cpp:342] Snapshotting solver state to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_40.solverstate
+I0303 12:46:21.280230 26781 solver.cpp:266] Iteration 40, Testing net (#0)
+I0303 12:46:23.081954 26781 solver.cpp:315]     Test net output #0: l1_error = 0 (* 1 = 0 loss)
+I0303 12:46:23.626909 26781 solver.cpp:189] Iteration 40, loss = -2.76417e-06
+I0303 12:46:23.626945 26781 solver.cpp:204]     Train net output #0: l1_error = 0 (* 1 = 0 loss)
+I0303 12:46:23.626971 26781 solver.cpp:585] Iteration 40, lr = 1e-07
+I0303 12:46:28.648854 26781 solver.cpp:334] Snapshotting to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_50.caffemodel
+I0303 12:46:28.767587 26781 solver.cpp:342] Snapshotting solver state to project/cnn-speech-denoising/models/model0/snapshots/noisy_iter_50.solverstate
+I0303 12:46:29.019464 26781 solver.cpp:248] Iteration 50, loss = 0
+I0303 12:46:29.019496 26781 solver.cpp:266] Iteration 50, Testing net (#0)
+I0303 12:46:30.819111 26781 solver.cpp:315]     Test net output #0: l1_error = 0.260084 (* 1 = 0.260084 loss)
+I0303 12:46:30.819160 26781 solver.cpp:253] Optimization Done.
+I0303 12:46:30.819188 26781 caffe.cpp:121] Optimization Done.

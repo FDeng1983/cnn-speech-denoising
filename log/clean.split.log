@@ -1,0 +1,12 @@
+User arguments
+{'--train_portion': '0.7',
+ '<root_dir>': 'dataset/mfcc/clean'}
+removing directory dataset/mfcc/clean/train for resampling
+removing directory dataset/mfcc/clean/dev for resampling
+making directory dataset/mfcc/clean/train
+making directory dataset/mfcc/clean/dev
+making directory dataset/mfcc/clean/train/spec
+making directory dataset/mfcc/clean/train/mfcc
+making directory dataset/mfcc/clean/dev/spec
+making directory dataset/mfcc/clean/dev/mfcc
+350 out of 500 files will be used for training

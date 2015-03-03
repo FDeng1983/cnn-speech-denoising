@@ -3,9 +3,9 @@
 ### Define your parameters here:
 
 CAFFEDIR=~/caffe
-DATASET=noisy
+DATASET=clean
 
-LOGDIR=~/caffe/log
+LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
 
 ### Helper functions
 
@@ -63,7 +63,7 @@ train() {
 
 ### Run what you want here:
 
-mkdir $LOGDIR
+mkdir -p $LOGDIR
 
 echo Splitting dataset to $SPLITLOG
 
