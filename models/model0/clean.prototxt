@@ -4,23 +4,23 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/mfcc/clean/sampled/filelist.txt"
+    source: "project/cnn-speech-denoising/dataset/mfcc/clean/train/sampled/filelist.txt"
     batch_size: 50
   }
-  # include: { phase: TRAIN }
+  include: { phase: TRAIN }
 }
 
-#layers {
-#  name: "data"
-#  type: HDF5_DATA
-#  top: "data"
-#  top: "label"
-#  hdf5_data_param {
-#    source: "project/cnn-speech-denoising/dataset/mfcc/clean/sampled/filelist.txt"
-#    batch_size: 50
-#  }
-#  include: { phase: TEST }
-#}
+layers {
+  name: "data"
+  type: HDF5_DATA
+  top: "data"
+  top: "label"
+  hdf5_data_param {
+    source: "project/cnn-speech-denoising/dataset/mfcc/clean/dev/sampled/filelist.txt"
+    batch_size: 50
+  }
+  include: { phase: TEST }
+}
 
 layers {
   name: "flat"
@@ -143,7 +143,7 @@ layers {
 layers {
   bottom: "fc"
   bottom: "flat"
-  top: "l2_error"
+  top: "l1_error"
   name: "loss"
   type: HINGE_LOSS
   loss_weight: 1.

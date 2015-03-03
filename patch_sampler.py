@@ -2,11 +2,27 @@
 """ patch_sampler.py
 Usage:
   patch_sampler.py  <root_dir>
-                    [--samples_per_spectrogram=<samples_per_spectrogram>]
+                    [--samples_per_file=5]
                     [--verbose]
-                    [--x_len=<20>]
+                    [--x_len=20]
                     [--scale_mfcc=1]
-                    [--normalize_spec]
+                    [--normalize_spec=<mean_std_dump_file>]
+                    [--dev]
+
+Options:
+
+  --x_len=20                                how much in the time window do you want per patch [default: 20]
+
+  --scale_mfcc=1                            what do you want to scale the mfcc labels by [default: 1]
+
+  --samples_per_file=5                      how many samples you want to draw from each spectrogram/mfcc pair [default: 5]
+
+  --verbose                                 print logging information
+
+  --normalize_spec=<mean_std_dump_file>     perform zero-mean, unit-variance normalization on the spectrograms. The mean and std
+                                            will be calculated from the data and the result saved to <mean_std_dump_file>.
+
+  --dev                                     if this is specified, then the mean and std will always be loaded from <mean_std_dump_file>
 """
 
 import os
@@ -89,16 +105,13 @@ if __name__ == '__main__':
     from docopt import docopt
     args = docopt(__doc__)
 
-    def default(key, type_, val):
-        args[key] = type_(args[key]) if args[key] else val
-
-    default('--x_len', int, 20)
-    default('--samples_per_spectrogram', int, 5)
-    default('--scale_mfcc', float, 1)
-
     from pprint import pprint
     print 'User arguments:'
     pprint(args)
+
+    x_len = int(args['--x_len'])
+    samples_per_file = int(args['--samples_per_file'])
+    scale_mfcc = float(args['--scale_mfcc'])
 
     # where are the spectrograms
     root = args['<root_dir>']
@@ -110,9 +123,7 @@ if __name__ == '__main__':
     def get_fname(filenum):
         return os.path.join(out_dir, 'file.' + str(filenum) + '.h5')
 
-    sampler = PatchSampler(spec_dir, mfcc_dir, args['--samples_per_spectrogram'],
-        verbose=args['--verbose'],
-        x_len=args['--x_len'])
+    sampler = PatchSampler(spec_dir, mfcc_dir, samples_per_file, verbose=args['--verbose'], x_len=x_len)
 
     spec = []; mfcc = []
     for spec_patch, mfcc_patch in sampler:
@@ -126,12 +137,28 @@ if __name__ == '__main__':
     mfcc = np.concatenate(mfcc, axis=0)
 
     assert mfcc.max() < 100
-    print 'observed maximum', mfcc.max(), 'minimum', mfcc.min()
+    assert mfcc.min() >-100
+    print 'observed mfcc maximum', mfcc.max(), 'minimum', mfcc.min()
 
-    mfcc *= args['--scale_mfcc']
+    mfcc *= scale_mfcc
+
+    if args['--dev']:
+        assert args['--normalize_spec'], '--dev can only be used with --normalize_spec'
+        with open(args['--normalize_spec'], 'rb') as f:
+            print 'loading PREXISTING mean and std from', args['--normalize_spec']
+            mean, std = pkl.load(f)
 
     if args['--normalize_spec']:
-        spec = (spec - spec.mean(axis=0)) / spec.std(axis=0)
+        if not args['--dev']:
+            print 'calculating mean and std from data'
+            mean = spec.mean(axis=0)
+            std = spec.std(axis=0)
+            print 'saving normalization paramters to', args['--normalize_spec']
+            with open(args['--normalize_spec'], 'wb') as f:
+                pkl.dump((mean, std), f)
+
+        print 'normalizing spectrograms'
+        spec = (spec - mean) / std
 
     print 'writing out files'
     # write a new file

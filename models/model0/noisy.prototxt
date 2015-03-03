@@ -4,7 +4,7 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/dev/normalized/filelist.txt"
+    source: "project/cnn-speech-denoising/dataset/mfcc/noisy/train/sampled/filelist.txt"
     batch_size: 50
   }
   include: { phase: TRAIN }
@@ -16,10 +16,17 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/dev/normalized/filelist.txt"
+    source: "project/cnn-speech-denoising/dataset/mfcc/noisy/dev/sampled/filelist.txt"
     batch_size: 50
   }
   include: { phase: TEST }
+}
+
+layers {
+  name: "flat"
+  type: FLATTEN
+  top: "flat"
+  bottom: "label"
 }
 
 layers {
@@ -30,10 +37,12 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 1
-    kernel_size: 3
+    num_output: 4
+    kernel_h: 39
+    kernel_w: 5
     stride: 1
-    pad: 1
+    pad_h: 38
+    pad_w: 2
     weight_filler {
       type: "xavier"
       std: .0001
@@ -60,10 +69,12 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 1
-    kernel_size: 3
+    num_output: 8
+    kernel_h: 39
+    kernel_w: 5
     stride: 1
-    pad: 1
+    pad_h: 38
+    pad_w: 2
     weight_filler {
       type: "xavier"
       std: .0001
@@ -89,10 +100,12 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 1
-    kernel_size: 3
+    num_output: 2
+    kernel_h: 39
+    kernel_w: 5
     stride: 1
-    pad: 1
+    pad_h: 38
+    pad_w: 2
     weight_filler {
       type: "xavier"
       std: .0001
@@ -103,70 +116,35 @@ layers {
   }
 }
 
+
 layers {
-  name: "relu3"
-  type: RELU
+  name: "fc"
+  type: INNER_PRODUCT
+  blobs_lr: 1          # learning rate multiplier for the filters
+  blobs_lr: 2          # learning rate multiplier for the biases
+  weight_decay: 1      # weight decay multiplier for the filters
+  weight_decay: 0      # weight decay multiplier for the biases
+  inner_product_param {
+    num_output: 780
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
   bottom: "conv3"
-  top: "relu3"
-}
-
-layers {
-  name: "conv4"
-  type: CONVOLUTION
-  bottom: "relu3"
-  top: "conv4"
-  blobs_lr: 1
-  blobs_lr: 2
-  convolution_param {
-    num_output: 1
-    kernel_size: 3
-    stride: 1
-    pad: 1
-    weight_filler {
-      type: "xavier"
-      std: .0001
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-layers {
-  name: "relu4"
-  type: RELU
-  bottom: "conv4"
-  top: "relu4"
+  top: "fc"
 }
 
 
 layers {
-  name: "conv5"
-  type: CONVOLUTION
-  bottom: "relu4"
-  top: "conv5"
-  blobs_lr: 1
-  blobs_lr: 2
-  convolution_param {
-    num_output: 1
-    kernel_size: 3
-    stride: 1
-    pad: 1
-    weight_filler {
-      type: "xavier"
-      std: .01
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-layers {
-  bottom: "conv5"
-  bottom: "label"
-  top: "l2_error"
+  bottom: "fc"
+  bottom: "flat"
+  top: "l1_error"
   name: "loss"
-  type: EUCLIDEAN_LOSS
-  loss_weight: .0001
+  type: HINGE_LOSS
+  loss_weight: 1.
 }
