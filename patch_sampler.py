@@ -122,8 +122,15 @@ if __name__ == '__main__':
 
     patches_sampled = 0; filenum = 0; total_patches_seen = 0
     spec = None; mfcc = None; mfcc_mean = None; spec_mean = None
+
+    max_seen = 0
+    min_seen = np.inf
+
     for spec_patch, mfcc_patch in sampler:
         patches_sampled += 1
+
+        max_seen = np.max([spec_patch.max(), mfcc_patch.max(), max_seen])
+        min_seen = np.min([spec_patch.min(), mfcc_patch.min(), min_seen])
 
         # scale if requested
         spec_patch *= args['--scale']
@@ -144,6 +151,9 @@ if __name__ == '__main__':
             filenum += 1
             # empty buffers
             spec = None; mfcc = None; patches_sampled = 0
+
+    print 'maximum magnitude seen:', max_seen
+    print 'minimum magnitude seen:', min_seen
 
     # write out book keeping files
     with open(os.path.join(out_dir, 'filelist.txt'), 'wb') as f:
