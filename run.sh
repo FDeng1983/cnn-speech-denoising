@@ -74,7 +74,7 @@ train() {
 	python project/cnn-speech-denoising/replace.py "+EXPT_NAME+" ${EXPTNAME} > project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
 
     ./build/tools/caffe train \
-        --solver=project/cnn-speech-denoising/models/model0/${NET}_solver.prototxt  > $CAFFELOG 2>&1 || fail
+        --solver=project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt  > $CAFFELOG 2>&1 || fail
 }
 
 
