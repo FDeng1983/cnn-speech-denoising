@@ -6,6 +6,7 @@ Usage:
                     [--verbose]
                     [--x_len=20]
                     [--scale_mfcc=1]
+                    [--random_seed=1003]
                     [--normalize_spec=<mean_std_dump_file>]
                     [--dev]
 
@@ -16,6 +17,8 @@ Options:
   --scale_mfcc=1                            what do you want to scale the mfcc labels by [default: 1]
 
   --samples_per_file=5                      how many samples you want to draw from each spectrogram/mfcc pair [default: 5]
+
+  --random_seed=1003                        seed for random number generator [default: 1003]
 
   --verbose                                 print logging information
 
@@ -112,6 +115,9 @@ if __name__ == '__main__':
     x_len = int(args['--x_len'])
     samples_per_file = int(args['--samples_per_file'])
     scale_mfcc = float(args['--scale_mfcc'])
+    seed = int(args['--random_seed'])
+
+    np.random.seed(seed=seed)
 
     # where are the spectrograms
     root = args['<root_dir>']
