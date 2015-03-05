@@ -2,7 +2,7 @@
 
 ### Define your parameters here:
 
-CAFFEDIR=~/scr/conv/caffe
+CAFFEDIR=~/caffe
 DATASET=noisy_to_clean
 
 LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
@@ -11,7 +11,8 @@ LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
 
 NET=$DATASET
 DATAROOT=dataset/mfcc/conditions
-MAXFILES=20
+MAXFILES=200
+TIMESLICE=10
 
 
 EXPTNAME=${DATASET}.${MAXFILES}
@@ -56,10 +57,10 @@ sample() {
     cd_proj
 
     # sample the training data, normalize and dump the normalization params to disk
-    python patch_sampler.py $DATAROOT/${EXPTNAME}/train --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc 1e-2 > $SAMPLELOG || fail
+    python patch_sampler.py $DATAROOT/${EXPTNAME}/train --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc 1e-2 --x_len $TIMESLICE > $SAMPLELOG || fail
 
     # sample the dev data, normalize using the normalization params dumped during training
-    python patch_sampler.py $DATAROOT/${EXPTNAME}/dev --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc 1e-2 --dev >> $SAMPLELOG || fail
+    python patch_sampler.py $DATAROOT/${EXPTNAME}/dev --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc 1e-2 --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
 }
 
 train() {
