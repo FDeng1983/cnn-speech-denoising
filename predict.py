@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     import h5py
     with h5py.File(input_hdf5) as f:
-        X = f['ps/value'].value
+        X = np.log(f['ps/value'].value)
     print 'input data has shape', X.shape
 
     batch_start = 0
