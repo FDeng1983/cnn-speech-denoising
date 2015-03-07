@@ -66,7 +66,7 @@ class SpectrogramMFCC(object):
             assert mfcc_patch.max() < 100
             assert mfcc_patch.min() > -100
 
-            yield spec_patch.reshape(1, 1, -1, x_len), mfcc_patch.reshape(1, 1, -1, x_len)
+            yield spec_patch.reshape(1, 1, x_len, -1), mfcc_patch.reshape(1, 1, x_len, -1)
 
 
 class PatchSampler(object):
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     for spec_patch, mfcc_patch in sampler:
 
         # concatenate the patches to buffer the write
-        spec += [spec_patch]
+        spec += [np.log(spec_patch)]
         mfcc += [mfcc_patch]
 
     # Concatenate
