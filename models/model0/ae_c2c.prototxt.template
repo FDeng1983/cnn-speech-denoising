@@ -4,7 +4,7 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/mfcc/clean/train/sampled/filelist.txt"
+    source: "+TRAIN_DIR+/filelist.txt"
     batch_size: 50
   }
   include: { phase: TRAIN }
@@ -16,7 +16,7 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/mfcc/clean/dev/sampled/filelist.txt"
+    source: "+TEST_DIR+/filelist.txt"
     batch_size: 50
   }
   include: { phase: TEST }
@@ -41,7 +41,7 @@ layers {
     kernel_h: 39
     kernel_w: 5
     stride: 1
-    pad_h: 38
+    pad_h: 19
     pad_w: 2
     weight_filler {
       type: "xavier"
@@ -73,7 +73,7 @@ layers {
     kernel_h: 39
     kernel_w: 5
     stride: 1
-    pad_h: 38
+    pad_h: 19
     pad_w: 2
     weight_filler {
       type: "xavier"
@@ -104,7 +104,7 @@ layers {
     kernel_h: 39
     kernel_w: 5
     stride: 1
-    pad_h: 38
+    pad_h: 19
     pad_w: 2
     weight_filler {
       type: "xavier"
@@ -118,7 +118,67 @@ layers {
 
 
 layers {
-  name: "fc"
+  name: "fc1"
+  type: INNER_PRODUCT
+  blobs_lr: 1          # learning rate multiplier for the filters
+  blobs_lr: 2          # learning rate multiplier for the biases
+  weight_decay: 1      # weight decay multiplier for the filters
+  weight_decay: 0      # weight decay multiplier for the biases
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+  bottom: "conv3"
+  top: "fc1"
+}
+
+layers {
+  name: "relufc1"
+  type: RELU
+  bottom: "fc1"
+  top: "relufc1"
+}
+
+
+layers {
+  name: "fc2"
+  type: INNER_PRODUCT
+  blobs_lr: 1          # learning rate multiplier for the filters
+  blobs_lr: 2          # learning rate multiplier for the biases
+  weight_decay: 1      # weight decay multiplier for the filters
+  weight_decay: 0      # weight decay multiplier for the biases
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+  bottom: "relufc1"
+  top: "fc2"
+}
+
+layers {
+  name: "relufc2"
+  type: RELU
+  bottom: "fc2"
+  top: "relufc2"
+}
+
+
+layers {
+  name: "fc3"
   type: INNER_PRODUCT
   blobs_lr: 1          # learning rate multiplier for the filters
   blobs_lr: 2          # learning rate multiplier for the biases
@@ -135,16 +195,23 @@ layers {
       value: 0
     }
   }
-  bottom: "conv3"
-  top: "fc"
+  bottom: "relufc2"
+  top: "fc3"
+}
+
+layers {
+  bottom: "fc3"
+  top: "tanh"
+  name: "tanh"
+  type: TANH
 }
 
 
 layers {
-  bottom: "fc"
+  bottom: "tanh"
   bottom: "flat"
-  top: "l1_error"
+  top: "l2_error"
   name: "loss"
-  type: HINGE_LOSS
+  type: EUCLIDEAN_LOSS
   loss_weight: 1.
 }

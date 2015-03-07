@@ -4,8 +4,8 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/mfcc/noisy/train/sampled/filelist.txt"
-    batch_size: 50
+    source: "+TRAIN_DIR+/filelist.txt"
+    batch_size: 10
   }
   include: { phase: TRAIN }
 }
@@ -16,8 +16,8 @@ layers {
   top: "data"
   top: "label"
   hdf5_data_param {
-    source: "project/cnn-speech-denoising/dataset/mfcc/noisy/dev/sampled/filelist.txt"
-    batch_size: 50
+    source: "+TEST_DIR+/filelist.txt"
+    batch_size: 10
   }
   include: { phase: TEST }
 }
@@ -37,11 +37,11 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 4
-    kernel_h: 39
-    kernel_w: 5
+    num_output: 32
+    kernel_h: 64
+    kernel_w: 3
     stride: 1
-    pad_h: 38
+    pad_h: 63
     pad_w: 2
     weight_filler {
       type: "xavier"
@@ -69,11 +69,11 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 8
-    kernel_h: 39
-    kernel_w: 5
+    num_output: 32
+    kernel_h: 64
+    kernel_w: 3
     stride: 1
-    pad_h: 38
+    pad_h: 63
     pad_w: 2
     weight_filler {
       type: "xavier"
@@ -100,11 +100,11 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 2
-    kernel_h: 39
-    kernel_w: 5
+    num_output: 16
+    kernel_h: 32
+    kernel_w: 3
     stride: 1
-    pad_h: 38
+    pad_h: 31
     pad_w: 2
     weight_filler {
       type: "xavier"
@@ -116,6 +116,68 @@ layers {
   }
 }
 
+layers {
+  name: "relu3"
+  type: RELU
+  bottom: "conv3"
+  top: "relu3"
+}
+
+
+layers {
+  name: "conv4"
+  type: CONVOLUTION
+  bottom: "relu3"
+  top: "conv4"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 16
+    kernel_h: 32
+    kernel_w: 3
+    stride: 1
+    pad_h: 31
+    pad_w: 2
+    weight_filler {
+      type: "xavier"
+      std: .0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "relu4"
+  type: RELU
+  bottom: "conv4"
+  top: "relu4"
+}
+
+layers {
+  name: "conv5"
+  type: CONVOLUTION
+  bottom: "relu4"
+  top: "conv5"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 16
+    kernel_h: 32
+    kernel_w: 3
+    stride: 1
+    pad_h: 31
+    pad_w: 2
+    weight_filler {
+      type: "xavier"
+      std: .0001
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
 
 layers {
   name: "fc"
@@ -125,17 +187,17 @@ layers {
   weight_decay: 1      # weight decay multiplier for the filters
   weight_decay: 0      # weight decay multiplier for the biases
   inner_product_param {
-    num_output: 780
+    num_output: 390
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+      type: "xavier"
+      std: .0001
     }
     bias_filler {
       type: "constant"
       value: 0
     }
   }
-  bottom: "conv3"
+  bottom: "conv5"
   top: "fc"
 }
 
@@ -143,8 +205,8 @@ layers {
 layers {
   bottom: "fc"
   bottom: "flat"
-  top: "l1_error"
+  top: "l2_error"
   name: "loss"
-  type: HINGE_LOSS
+  type: EUCLIDEAN_LOSS
   loss_weight: 1.
 }
