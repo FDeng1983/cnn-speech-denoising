@@ -66,7 +66,9 @@ class SpectrogramMFCC(object):
             assert mfcc_patch.max() < 100
             assert mfcc_patch.min() > -100
 
-            yield spec_patch.reshape(1, 1, -1, x_len), mfcc_patch.reshape(1, 1, -1, x_len)
+            spec_patch = spec_patch[None,...]
+            mfcc_patch = mfcc_patch[None,...]
+            yield spec_patch, mfcc_patch
 
 
 class PatchSampler(object):
