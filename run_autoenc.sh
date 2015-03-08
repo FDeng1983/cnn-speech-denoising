@@ -4,18 +4,20 @@
 
 CAFFEDIR=~/scr/conv/caffe
 DATASET=noisy_to_clean
+NET=ae_n2c
 
 LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
 
 ### Helper functions
 
-NET=$DATASET
 DATAROOT=dataset/autoencoder/conditions
 MAXFILES=200
 TIMESLICE=10
+LR=0.01
+GAMMA=0.5
 
 
-EXPTNAME=${DATASET}.${MAXFILES}
+EXPTNAME=ae_${DATASET}.f${MAXFILES}.t${TIMESLICE}
 
 TRAINDIR=project/cnn-speech-denoising/${DATAROOT}/${EXPTNAME}/train/sampled
 TESTDIR=project/cnn-speech-denoising/${DATAROOT}/${EXPTNAME}/dev/sampled
@@ -68,11 +70,10 @@ train() {
     cd_caffe
 
     cat project/cnn-speech-denoising/models/model0/${NET}.prototxt.template | \
-	python project/cnn-speech-denoising/replace.py "+TEST_DIR+" ${TESTDIR} | \
-	python project/cnn-speech-denoising/replace.py "+TRAIN_DIR+" ${TRAINDIR} > project/cnn-speech-denoising/models/model0/${EXPTNAME}.prototxt
+	python project/cnn-speech-denoising/replace.py "+TEST_DIR+,${TESTDIR}" "+TRAIN_DIR+,${TRAINDIR}"  > project/cnn-speech-denoising/models/model0/${EXPTNAME}.prototxt
 
     cat project/cnn-speech-denoising/models/model0/${NET}_solver.prototxt.template | \
-	python project/cnn-speech-denoising/replace.py "+EXPT_NAME+" ${EXPTNAME} > project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
+	python project/cnn-speech-denoising/replace.py "+EXPT_NAME+,${EXPTNAME}" "+LEARNING_RATE+,${LR}" "+GAMMA+,${GAMMA}" > project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
 
     ./build/tools/caffe train \
         --solver=project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt  > $CAFFELOG 2>&1 || fail
@@ -85,10 +86,10 @@ train() {
 mkdir -p $LOGDIR
 
 # These two are destructive in that they are stochastic and will overwrite your splits and samples
-#split
+split
 sample
 
 # This trains caffe
-#train
+train
 
 success

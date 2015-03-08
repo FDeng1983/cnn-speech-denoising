@@ -1,14 +1,18 @@
 import sys
 import argparse
+import string
 
 def main(argv):
    parser = argparse.ArgumentParser()
-   parser.add_argument("string_to_find", help="string to find")
-   parser.add_argument("replacement", help="replacement string")
+   parser.add_argument("replacements", nargs='+', help="replacements to make")
    args = parser.parse_args()
 
+   pairs = [tuple(string.split(x,',',2)) for x in args.replacements]
+
    for line in sys.stdin:
-       print line.replace(args.string_to_find, args.replacement).rstrip('\n')
+      for x, y in pairs:
+         line = line.replace(x,y)
+      print line.rstrip("\n")
 
 
 if __name__ == "__main__":

@@ -23,13 +23,6 @@ layers {
 }
 
 layers {
-  name: "flat"
-  type: FLATTEN
-  top: "flat"
-  bottom: "label"
-}
-
-layers {
   name: "conv1"
   type: CONVOLUTION
   bottom: "data"
@@ -38,14 +31,13 @@ layers {
   blobs_lr: 2
   convolution_param {
     num_output: 32
-    kernel_h: 64
-    kernel_w: 3
+    kernel_h: 1
+    kernel_w: 1
     stride: 1
-    pad_h: 63
-    pad_w: 2
+    pad_h: 0
+    pad_w: 0
     weight_filler {
       type: "xavier"
-      std: .0001
     }
     bias_filler {
       type: "constant"
@@ -70,14 +62,13 @@ layers {
   blobs_lr: 2
   convolution_param {
     num_output: 32
-    kernel_h: 64
-    kernel_w: 3
+    kernel_h: 1
+    kernel_w: 1
     stride: 1
-    pad_h: 63
-    pad_w: 2
+    pad_h: 0
+    pad_w: 0
     weight_filler {
       type: "xavier"
-      std: .0001
     }
     bias_filler {
       type: "constant"
@@ -100,15 +91,14 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 16
-    kernel_h: 32
-    kernel_w: 3
+    num_output: 32
+    kernel_h: 5
+    kernel_w: 5
     stride: 1
-    pad_h: 31
+    pad_h: 2
     pad_w: 2
     weight_filler {
       type: "xavier"
-      std: .0001
     }
     bias_filler {
       type: "constant"
@@ -123,24 +113,22 @@ layers {
   top: "relu3"
 }
 
-
 layers {
   name: "conv4"
   type: CONVOLUTION
-  bottom: "relu3"
+  bottom: "conv3"
   top: "conv4"
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 16
-    kernel_h: 32
-    kernel_w: 3
+    num_output: 32
+    kernel_h: 5
+    kernel_w: 5
     stride: 1
-    pad_h: 31
+    pad_h: 2
     pad_w: 2
     weight_filler {
       type: "xavier"
-      std: .0001
     }
     bias_filler {
       type: "constant"
@@ -148,63 +136,10 @@ layers {
   }
 }
 
+
 layers {
-  name: "relu4"
-  type: RELU
   bottom: "conv4"
-  top: "relu4"
-}
-
-layers {
-  name: "conv5"
-  type: CONVOLUTION
-  bottom: "relu4"
-  top: "conv5"
-  blobs_lr: 1
-  blobs_lr: 2
-  convolution_param {
-    num_output: 16
-    kernel_h: 32
-    kernel_w: 3
-    stride: 1
-    pad_h: 31
-    pad_w: 2
-    weight_filler {
-      type: "xavier"
-      std: .0001
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-layers {
-  name: "fc"
-  type: INNER_PRODUCT
-  blobs_lr: 1          # learning rate multiplier for the filters
-  blobs_lr: 2          # learning rate multiplier for the biases
-  weight_decay: 1      # weight decay multiplier for the filters
-  weight_decay: 0      # weight decay multiplier for the biases
-  inner_product_param {
-    num_output: 390
-    weight_filler {
-      type: "xavier"
-      std: .0001
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-  bottom: "conv5"
-  top: "fc"
-}
-
-
-layers {
-  bottom: "fc"
-  bottom: "flat"
+  bottom: "label"
   top: "l2_error"
   name: "loss"
   type: EUCLIDEAN_LOSS

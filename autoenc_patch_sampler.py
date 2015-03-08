@@ -45,7 +45,7 @@ class SpectrogramPair(object):
                 self.input_spec_mat = f['ps/value'].value
                 if augment_input:
                     orig = self.input_spec_mat
-                    tempmatrix = np.tile(np.arange(float(orig.shape[1])),(orig.shape[0],1))
+                    tempmatrix = np.tile(np.arange(float(orig.shape[1])),(orig.shape[0],1)) / float(orig.shape[1])
                     self.input_spec_mat = np.vstack((orig[None,...], tempmatrix[None,...]))
                 else:
                     self.input_spec_mat = self.input_spec_mat.reshape((1,)+self.input_spec_mat.shape)
@@ -74,7 +74,7 @@ class SpectrogramPair(object):
             assert output_spec_patch.shape == input_spec_patch.shape[1:]
 
             input_spec_patch = input_spec_patch[None,...]
-            output_spec_patch = output_spec_patch[None,...]
+            output_spec_patch = output_spec_patch[None,None,...]
             yield input_spec_patch, output_spec_patch
 
 
@@ -183,11 +183,11 @@ if __name__ == '__main__':
                 pkl.dump((mean, std), f)
 
         print 'normalizing input spectrograms'
-        input_spec_slice = (input_spec_slice - mean) / std
+        input_spec[:,0,:,:] = (input_spec_slice - mean) / std
         print 'normalizing output spectrograms'
         output_spec = (output_spec - mean) / std
 
-    print 'observed input_spec maximum', input_spec_slice.max(), 'minimum', input_spec_slice.min()
+    print 'observed input_spec maximum', input_spec[:,0,:,:].max(), 'minimum', input_spec[:,0,:,:].min()
     print 'observed output_spec maximum', output_spec.max(), 'minimum', output_spec.min()
 
 

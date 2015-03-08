@@ -9,9 +9,9 @@ lr_policy: "step" # learning rate policy: drop the learning rate in "steps"
 gamma: +GAMMA+        # drop the learning rate by a factor of 10
                   # (i.e., multiply it by a factor of gamma = 0.1)
 
-stepsize: 20  # drop the learning rate every 100K iterations
+stepsize: 20 
 
-max_iter: 200  # train for 350K iterations total
+max_iter: 200
 
 display: 10
 momentum: 0.9
