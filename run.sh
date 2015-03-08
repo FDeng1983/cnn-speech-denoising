@@ -13,7 +13,7 @@ NET=$DATASET
 DATAROOT=dataset/mfcc/conditions
 MAXFILES=200
 TIMESLICE=10
-
+SCALE_MFCC=1
 
 EXPTNAME=${DATASET}.${MAXFILES}
 
@@ -57,10 +57,10 @@ sample() {
     cd_proj
 
     # sample the training data, normalize and dump the normalization params to disk
-    python patch_sampler.py $DATAROOT/${EXPTNAME}/train --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc 1e-2 --x_len $TIMESLICE > $SAMPLELOG || fail
+    python patch_sampler.py $DATAROOT/${EXPTNAME}/train --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc $SCALE_MFCC --x_len $TIMESLICE > $SAMPLELOG || fail
 
     # sample the dev data, normalize using the normalization params dumped during training
-    python patch_sampler.py $DATAROOT/${EXPTNAME}/dev --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc 1e-2 --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
+    python patch_sampler.py $DATAROOT/${EXPTNAME}/dev --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc $SCALE_MFCC --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
 }
 
 train() {
