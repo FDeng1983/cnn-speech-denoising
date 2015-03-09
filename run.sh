@@ -2,10 +2,16 @@
 
 ### Define your parameters here:
 
-CAFFEDIR=~/caffe
+DEFAULT_CAFFE_ROOT=~/scr/conv/caffe 
+if [ -z "${CAFFE_ROOT}" ]; then
+    CAFFE_ROOT=${DEFAULT_CAFFE_ROOT}
+fi
+
 DATASET=noisy_to_clean
 
-LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
+LOGDIR=${CAFFE_ROOT}/project/cnn-speech-denoising/log
+
+echo "Caffe root set to ${CAFFE_ROOT}"
 
 ### Helper functions
 
@@ -37,11 +43,11 @@ success() {
 }
 
 cd_proj() {
-    cd ${CAFFEDIR}/project/cnn-speech-denoising
+    cd ${CAFFE_ROOT}/project/cnn-speech-denoising
 }
 
 cd_caffe() {
-    cd ${CAFFEDIR}
+    cd ${CAFFE_ROOT}
 }
 
 split() {
