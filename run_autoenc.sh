@@ -20,16 +20,22 @@ LR=$4
 GAMMA=$5
 REG=$6
 MAXITER=$7
-NNARCH=$8
+AUGMENT=$8
+NNARCH=$9
 
 TESTSETSIZE=`python -c "print int($MAXFILES * $SAMPLES * .7)"`
 LOSSWEIGHT=`python -c "print 1./($TIMESLICE*257)"`
+AUGMENTSTRING=""
+
+if [ $AUGMENT -eq 1 ]; then
+    AUGMENTSTRING="--augment_input"
+fi
 
 echo "TEST SET SIZE: $TESTSETSIZE"
 echo "LOSS WEIGHT: $LOSSWEIGHT"
 
 DATACOND=ae_${DATASET}.f${MAXFILES}.s${SAMPLES}.t${TIMESLICE}
-EXPTNAME=${DATACOND}.lr${LR}.g${GAMMA}.reg${REG}.iter${MAXITER}.nn_${NNARCH}
+EXPTNAME=${DATACOND}.lr${LR}.g${GAMMA}.reg${REG}.iter${MAXITER}.aug${AUGMENT}.nn_${NNARCH}
 
 TRAINDIR=project/cnn-speech-denoising/${DATAROOT}/${DATACOND}/train/sampled
 TESTDIR=project/cnn-speech-denoising/${DATAROOT}/${DATACOND}/dev/sampled
@@ -77,10 +83,10 @@ sample() {
 
     if [ ! -d $DATAROOT/$DATACOND/train/sampled ]; then
 	# sample the training data, normalize and dump the normalization params to disk
-	python autoenc_patch_sampler.py $DATAROOT/${DATACOND}/train --augment_input --samples_per_file $SAMPLES --normalize_spec $DATAROOT/${DATACOND}/trained_normalization_params.pkl --x_len $TIMESLICE > $SAMPLELOG || fail
+	python autoenc_patch_sampler.py $DATAROOT/${DATACOND}/train $AUGMENTSTRING --samples_per_file $SAMPLES --normalize_spec $DATAROOT/${DATACOND}/trained_normalization_params.pkl --x_len $TIMESLICE > $SAMPLELOG || fail
 
 	# sample the dev data, normalize using the normalization params dumped during training
-	python autoenc_patch_sampler.py $DATAROOT/${DATACOND}/dev --augment_input --samples_per_file $SAMPLES --normalize_spec $DATAROOT/${DATACOND}/trained_normalization_params.pkl --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
+	python autoenc_patch_sampler.py $DATAROOT/${DATACOND}/dev $AUGMENTSTRING --samples_per_file $SAMPLES --normalize_spec $DATAROOT/${DATACOND}/trained_normalization_params.pkl --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
     else
 	echo "Reusing previous sample()..."
     fi
