@@ -2,26 +2,36 @@
 
 ### Define your parameters here:
 
-CAFFEDIR=~/scr/conv/caffe
-DATASET=noisy_to_clean
-NET=ae_n2c
+CAFFEDIR=~/caffe
+DATAROOT=dataset/autoencoder/conditions
 
-LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
+DATASET=noisy_to_clean
+NET=ae
 
 ### Helper functions
 
-DATAROOT=dataset/autoencoder/conditions
-MAXFILES=200
-TIMESLICE=10
-LR=0.01
-GAMMA=0.5
+MAXFILES=$1
+SAMPLES=$2
+TIMESLICE=$3
+LR=$4
+GAMMA=$5
+REG=$6
+MAXITER=$7
+NNARCH=$8
 
+TESTSETSIZE=`python -c "print int($MAXFILES * $SAMPLES * .7)"`
+LOSSWEIGHT=`python -c "print 1./($TIMESLICE*257)"`
 
-EXPTNAME=ae_${DATASET}.f${MAXFILES}.t${TIMESLICE}
+echo "TEST SET SIZE: $TESTSETSIZE"
+echo "LOSS WEIGHT: $LOSSWEIGHT"
 
-TRAINDIR=project/cnn-speech-denoising/${DATAROOT}/${EXPTNAME}/train/sampled
-TESTDIR=project/cnn-speech-denoising/${DATAROOT}/${EXPTNAME}/dev/sampled
+DATACOND=ae_${DATASET}.f${MAXFILES}.s${SAMPLES}.t${TIMESLICE}
+EXPTNAME=${DATACOND}.lr${LR}.g${GAMMA}.reg${REG}.iter${MAXITER}.nn_${NNARCH}
 
+TRAINDIR=project/cnn-speech-denoising/${DATAROOT}/${DATACOND}/train/sampled
+TESTDIR=project/cnn-speech-denoising/${DATAROOT}/${DATACOND}/dev/sampled
+
+LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
 SPLITLOG=${LOGDIR}/${EXPTNAME}.split.log
 SAMPLELOG=${LOGDIR}/${EXPTNAME}.sample.log
 CAFFELOG=${LOGDIR}/${EXPTNAME}.caffe.log
@@ -50,30 +60,53 @@ split() {
     echo Splitting dataset to $SPLITLOG
     cd_proj
 
-    # do a 70/30 split on the ${DATASET} dataset in to train and dev
-    python autoenc_split_dataset.py $DATAROOT/${DATASET} $DATAROOT/$EXPTNAME --max_files_to_process $MAXFILES > $SPLITLOG || fail
+    if [ ! -d $DATAROOT/$DATACOND ]; then
+	# do a 70/30 split on the ${DATASET} dataset in to train and dev
+	python autoenc_split_dataset.py $DATAROOT/${DATASET} $DATAROOT/$DATACOND --max_files_to_process $MAXFILES > $SPLITLOG || fail
+    else
+	echo "Reusing previous split()..."
+    fi
 }
 
 sample() {
     echo Sampling dataset to $SAMPLELOG
     cd_proj
 
-    # sample the training data, normalize and dump the normalization params to disk
-    python autoenc_patch_sampler.py $DATAROOT/${EXPTNAME}/train --augment_input --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --x_len $TIMESLICE > $SAMPLELOG || fail
+    if [ ! -d $DATAROOT/$DATACOND/train/sampled ]; then
+	# sample the training data, normalize and dump the normalization params to disk
+	python autoenc_patch_sampler.py $DATAROOT/${DATACOND}/train --augment_input --samples_per_file $SAMPLES --normalize_spec $DATAROOT/${DATACOND}/trained_normalization_params.pkl --x_len $TIMESLICE > $SAMPLELOG || fail
 
-    # sample the dev data, normalize using the normalization params dumped during training
-    python autoenc_patch_sampler.py $DATAROOT/${EXPTNAME}/dev --augment_input --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
+	# sample the dev data, normalize using the normalization params dumped during training
+	python autoenc_patch_sampler.py $DATAROOT/${DATACOND}/dev --augment_input --samples_per_file $SAMPLES --normalize_spec $DATAROOT/${DATACOND}/trained_normalization_params.pkl --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
+    else
+	echo "Reusing previous sample()..."
+    fi
 }
 
 train() {
     echo Training caffe to $CAFFELOG
     cd_caffe
 
-    cat project/cnn-speech-denoising/models/model0/${NET}.prototxt.template | \
-	python project/cnn-speech-denoising/replace.py "+TEST_DIR+,${TESTDIR}" "+TRAIN_DIR+,${TRAINDIR}"  > project/cnn-speech-denoising/models/model0/${EXPTNAME}.prototxt
+    in_net=project/cnn-speech-denoising/models/model0/${NET}.prototxt.template
+    out_net=project/cnn-speech-denoising/models/model0/${EXPTNAME}.prototxt
 
-    cat project/cnn-speech-denoising/models/model0/${NET}_solver.prototxt.template | \
-	python project/cnn-speech-denoising/replace.py "+EXPT_NAME+,${EXPTNAME}" "+LEARNING_RATE+,${LR}" "+GAMMA+,${GAMMA}" > project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
+    python project/cnn-speech-denoising/resolveTemplateVars.py --net $NNARCH $in_net $out_net \
+	"+TEST_DIR+,${TESTDIR}" \
+	"+TRAIN_DIR+,${TRAINDIR}" \
+	"+LOSS_WEIGHT+,${LOSSWEIGHT}" 
+	
+    in_solver=project/cnn-speech-denoising/models/model0/${NET}_solver.prototxt.template
+    out_solver=project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
+
+    python project/cnn-speech-denoising/resolveTemplateVars.py $in_solver $out_solver \
+	"+EXPT_NAME+,${EXPTNAME}" \
+	"+LEARNING_RATE+,${LR}" \
+	"+GAMMA+,${GAMMA}" \
+	"+MAX_ITER+,${MAXITER}" \
+	"+REG+,${REG}" \
+	"+TEST_SET_SIZE+,${TESTSETSIZE}" 
+	
+	
 
     ./build/tools/caffe train \
         --solver=project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt  > $CAFFELOG 2>&1 || fail
@@ -85,7 +118,7 @@ train() {
 
 mkdir -p $LOGDIR
 
-# These two are destructive in that they are stochastic and will overwrite your splits and samples
+# If the directory $DATAROOT/$DATACOND already exists, these will be no-ops and will reuse existing data
 split
 sample
 

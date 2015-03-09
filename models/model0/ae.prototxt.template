@@ -1,0 +1,35 @@
+layers {
+  name: "data"
+  type: HDF5_DATA
+  top: "data"
+  top: "label"
+  hdf5_data_param {
+    source: "+TRAIN_DIR+/filelist.txt"
+    batch_size: 10
+  }
+  include: { phase: TRAIN }
+}
+
+layers {
+  name: "data"
+  type: HDF5_DATA
+  top: "data"
+  top: "label"
+  hdf5_data_param {
+    source: "+TEST_DIR+/filelist.txt"
+    batch_size: 1
+  }
+  include: { phase: TEST }
+}
+
++NET+
+
+
+layers {
+  bottom: "final_output"
+  bottom: "label"
+  top: "l2_error"
+  name: "loss"
+  type: EUCLIDEAN_LOSS
+  loss_weight: +LOSS_WEIGHT+
+}

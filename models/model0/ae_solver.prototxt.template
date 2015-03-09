@@ -1,0 +1,22 @@
+net: "project/cnn-speech-denoising/models/model0/+EXPT_NAME+.prototxt"
+test_iter: +TEST_SET_SIZE+
+test_interval: 10
+base_lr: +LEARNING_RATE+     # begin training at a learning rate of 0.01 = 1e-2
+
+lr_policy: "step" # learning rate policy: drop the learning rate in "steps"
+                  # by a factor of gamma every stepsize iterations
+
+gamma: +GAMMA+        # drop the learning rate by a factor of 10
+                  # (i.e., multiply it by a factor of gamma = 0.1)
+
+stepsize: 20 
+
+max_iter: +MAX_ITER+
+
+display: 10
+momentum: 0.9
+weight_decay: +REG+
+snapshot: 10000
+snapshot_prefix: "project/cnn-speech-denoising/models/model0/snapshots/+EXPT_NAME+"
+solver_mode: GPU
+solver_type: NESTEROV
