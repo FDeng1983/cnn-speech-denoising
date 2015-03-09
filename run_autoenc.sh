@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
 ### Define your parameters here:
+DEFAULT_CAFFE_ROOT=~/scr/conv/caffe 
+if [ -z "${CAFFE_ROOT}" ]; then
+    CAFFE_ROOT=${DEFAULT_CAFFE_ROOT}
+fi
 
-CAFFEDIR=~/caffe
 DATAROOT=dataset/autoencoder/conditions
 
 DATASET=noisy_to_clean
@@ -31,7 +34,7 @@ EXPTNAME=${DATACOND}.lr${LR}.g${GAMMA}.reg${REG}.iter${MAXITER}.nn_${NNARCH}
 TRAINDIR=project/cnn-speech-denoising/${DATAROOT}/${DATACOND}/train/sampled
 TESTDIR=project/cnn-speech-denoising/${DATAROOT}/${DATACOND}/dev/sampled
 
-LOGDIR=${CAFFEDIR}/project/cnn-speech-denoising/log
+LOGDIR=${CAFFE_ROOT}/project/cnn-speech-denoising/log
 SPLITLOG=${LOGDIR}/${EXPTNAME}.split.log
 SAMPLELOG=${LOGDIR}/${EXPTNAME}.sample.log
 CAFFELOG=${LOGDIR}/${EXPTNAME}.caffe.log
@@ -49,11 +52,11 @@ success() {
 }
 
 cd_proj() {
-    cd ${CAFFEDIR}/project/cnn-speech-denoising
+    cd ${CAFFE_ROOT}/project/cnn-speech-denoising
 }
 
 cd_caffe() {
-    cd ${CAFFEDIR}
+    cd ${CAFFE_ROOT}
 }
 
 split() {
