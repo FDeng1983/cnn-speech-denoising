@@ -47,15 +47,21 @@
 
 ########################
 
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c9x9.16_r_c9x9.16_r_c9x9.1
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x7.16_r_c7x7.16_r_c7x7.1
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c5x5.16_r_c5x5.16_r_c5x5.1
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c1x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
-bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x1.16_r_c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c9x9.16_r_c9x9.16_r_c9x9.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x7.16_r_c7x7.16_r_c7x7.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c5x5.16_r_c5x5.16_r_c5x5.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c1x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+#bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x1.16_r_c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
 bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x1.16_r_c1x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
 bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c1x7.16_r_c7x1.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+
+bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x1.16_r_c1x7.16_r_c7x1.16_r_c1x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c1x7.16_r_c7x1.16_r_c1x7.16_r_c7x1.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
+
+bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c7x1.32_r_c1x7.32_r_c7x7.32_r_c7x7.32_r_c7x7.1
+bash run_autoenc.sh 100 5 100 .0001 .9 0 1000 0 c1x7.32_r_c7x1.32_r_c7x7.32_r_c7x7.32_r_c7x7.1
 
 bash run_autoenc.sh 100 5 100 .0001 .9 0.000001 1000 0 c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
 bash run_autoenc.sh 100 5 100 .0001 .9 0.000001 1000 0 c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.16_r_c7x7.1
