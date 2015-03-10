@@ -31,7 +31,7 @@ layers {
 RELU= """
 layers {
   name: "+NAME+"
-  type: RELU
+  type: TANH
   bottom: "+BOTTOM+"
   top: "+TOP+"
 }

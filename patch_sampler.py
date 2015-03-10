@@ -58,16 +58,16 @@ class SpectrogramMFCC(object):
         for i in xrange(self.num_samples):
             x_start = np.random.randint(low=0, high=x_max-x_len)
 
-            mfcc_patch = self.mfcc_mat[x_start:x_start+x_len, :]
+            mfcc_patch = self.mfcc_mat[x_start:x_start+x_len, :13]
             spec_patch = self.spec_mat[x_start:x_start+x_len, :]
 
-            assert mfcc_patch.shape == (spec_patch.shape[0], 39)
+            assert mfcc_patch.shape == (spec_patch.shape[0], 13)
 
             assert mfcc_patch.max() < 100
             assert mfcc_patch.min() > -100
 
-            spec_patch = spec_patch[None,...]
-            mfcc_patch = mfcc_patch[None,...]
+            spec_patch = spec_patch.reshape((1, 1,spec_patch.shape[0], spec_patch.shape[1]))
+            mfcc_patch = mfcc_patch.reshape((1, 1,mfcc_patch.shape[0], mfcc_patch.shape[1]))
             yield spec_patch, mfcc_patch
 
 
@@ -141,9 +141,9 @@ if __name__ == '__main__':
         mfcc += [mfcc_patch]
 
     # Concatenate
-    spec = np.concatenate(spec, axis=0)
-    mfcc = np.concatenate(mfcc, axis=0)
-
+    spec = np.concatenate(np.array(spec), axis=0)
+    mfcc = np.concatenate(np.array(mfcc), axis=0)
+    mfcc = np.transpose(mfcc, (0,3,2,1))
     assert mfcc.max() < 100
     assert mfcc.min() >-100
     print 'observed mfcc maximum', mfcc.max(), 'minimum', mfcc.min()

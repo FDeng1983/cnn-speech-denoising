@@ -1,6 +1,6 @@
 net: "project/cnn-speech-denoising/models/model0/+EXPT_NAME+.prototxt"
 test_iter: +TEST_SET_SIZE+
-test_interval: 10
+test_interval: 50
 base_lr: +LEARNING_RATE+     # begin training at a learning rate of 0.01 = 1e-2
 
 lr_policy: "step" # learning rate policy: drop the learning rate in "steps"

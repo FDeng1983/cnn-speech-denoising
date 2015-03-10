@@ -22,90 +22,194 @@ layers {
   include: { phase: TEST }
 }
 
-layers {
-  name: "flat"
-  type: FLATTEN
-  top: "flat"
-  bottom: "label"
-}
+
+
+
 
 layers {
-  name: "conv1"
+  name: "c0"
   type: CONVOLUTION
   bottom: "data"
+  top: "c0"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 24
+    kernel_h: 7
+    kernel_w: 7
+    stride: 1
+    pad_h: 3
+    pad_w: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+
+
+
+layers {
+  name: "r1"
+  type: TANH
+  bottom: "c0"
+  top: "r1"
+}
+
+
+
+
+layers {
+  name: "c2"
+  type: CONVOLUTION
+  bottom: "r1"
+  top: "c2"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 24
+    kernel_h: 7
+    kernel_w: 7
+    stride: 1
+    pad_h: 3
+    pad_w: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+
+
+
+layers {
+  name: "r3"
+  type: TANH
+  bottom: "c2"
+  top: "r3"
+}
+
+
+
+
+layers {
+  name: "c4"
+  type: CONVOLUTION
+  bottom: "r3"
+  top: "c4"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 24
+    kernel_h: 7
+    kernel_w: 7
+    stride: 1
+    pad_h: 3
+    pad_w: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+
+
+
+layers {
+  name: "r5"
+  type: TANH
+  bottom: "c4"
+  top: "r5"
+}
+
+
+
+
+layers {
+  name: "c6"
+  type: CONVOLUTION
+  bottom: "r5"
+  top: "c6"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 24
+    kernel_h: 7
+    kernel_w: 7
+    stride: 1
+    pad_h: 3
+    pad_w: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+
+
+
+layers {
+  name: "r7"
+  type: TANH
+  bottom: "c6"
+  top: "r7"
+}
+
+
+
+
+layers {
+  name: "c8"
+  type: CONVOLUTION
+  bottom: "r7"
+  top: "final_output"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 1
+    kernel_h: 7
+    kernel_w: 7
+    stride: 1
+    pad_h: 3
+    pad_w: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+
+
+
+layers {
+  name: "convout"
+  type: CONVOLUTION
+  bottom: "c8"
   top: "conv1"
   blobs_lr: 1
   blobs_lr: 2
   convolution_param {
-    num_output: 4
-    kernel_h: 39
-    kernel_w: 5
+    num_output: 13
+    kernel_h: 1
+    kernel_w: 257
     stride: 1
-    pad_h: 19
-    pad_w: 2
-    weight_filler {
-      type: "xavier"
-      std: .0001
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-layers {
-  name: "relu1"
-  type: RELU
-  bottom: "conv1"
-  top: "relu1"
-}
-
-
-layers {
-  name: "conv2"
-  type: CONVOLUTION
-  bottom: "relu1"
-  top: "conv2"
-  blobs_lr: 1
-  blobs_lr: 2
-  convolution_param {
-    num_output: 8
-    kernel_h: 39
-    kernel_w: 5
-    stride: 1
-    pad_h: 19
-    pad_w: 2
-    weight_filler {
-      type: "xavier"
-      std: .0001
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-layers {
-  name: "relu2"
-  type: RELU
-  bottom: "conv2"
-  top: "relu2"
-}
-
-layers {
-  name: "conv3"
-  type: CONVOLUTION
-  bottom: "relu2"
-  top: "conv3"
-  blobs_lr: 1
-  blobs_lr: 2
-  convolution_param {
-    num_output: 2
-    kernel_h: 39
-    kernel_w: 5
-    stride: 1
-    pad_h: 19
-    pad_w: 2
+    pad_h: 0
+    pad_w: 0
     weight_filler {
       type: "xavier"
       std: .0001
@@ -117,99 +221,10 @@ layers {
 }
 
 
-layers {
-  name: "fc1"
-  type: INNER_PRODUCT
-  blobs_lr: 1          # learning rate multiplier for the filters
-  blobs_lr: 2          # learning rate multiplier for the biases
-  weight_decay: 1      # weight decay multiplier for the filters
-  weight_decay: 0      # weight decay multiplier for the biases
-  inner_product_param {
-    num_output: 1024
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-  bottom: "conv3"
-  top: "fc1"
-}
 
 layers {
-  name: "relufc1"
-  type: RELU
-  bottom: "fc1"
-  top: "relufc1"
-}
-
-
-layers {
-  name: "fc2"
-  type: INNER_PRODUCT
-  blobs_lr: 1          # learning rate multiplier for the filters
-  blobs_lr: 2          # learning rate multiplier for the biases
-  weight_decay: 1      # weight decay multiplier for the filters
-  weight_decay: 0      # weight decay multiplier for the biases
-  inner_product_param {
-    num_output: 1024
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-  bottom: "relufc1"
-  top: "fc2"
-}
-
-layers {
-  name: "relufc2"
-  type: RELU
-  bottom: "fc2"
-  top: "relufc2"
-}
-
-
-layers {
-  name: "fc3"
-  type: INNER_PRODUCT
-  blobs_lr: 1          # learning rate multiplier for the filters
-  blobs_lr: 2          # learning rate multiplier for the biases
-  weight_decay: 1      # weight decay multiplier for the filters
-  weight_decay: 0      # weight decay multiplier for the biases
-  inner_product_param {
-    num_output: 780
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-  bottom: "relufc2"
-  top: "fc3"
-}
-
-layers {
-  bottom: "fc3"
-  top: "tanh"
-  name: "tanh"
-  type: TANH
-}
-
-
-layers {
-  bottom: "tanh"
-  bottom: "flat"
+  bottom: "convout"
+  bottom: "label"
   top: "l2_error"
   name: "loss"
   type: EUCLIDEAN_LOSS

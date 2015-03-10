@@ -37,3 +37,6 @@ sftp-config.json
 out/
 spec/
 dataset/
+
+*.prototxt
+log*/

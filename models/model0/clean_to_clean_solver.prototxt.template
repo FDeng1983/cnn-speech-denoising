@@ -1,17 +1,17 @@
 net: "project/cnn-speech-denoising/models/model0/+EXPT_NAME+.prototxt"
 test_iter: 10
 test_interval: 10
-base_lr: 1e-5     # begin training at a learning rate of 0.01 = 1e-2
+base_lr: 1e-6     # begin training at a learning rate of 0.01 = 1e-2
 
 lr_policy: "step" # learning rate policy: drop the learning rate in "steps"
                   # by a factor of gamma every stepsize iterations
 
-gamma: 0.6        # drop the learning rate by a factor of 10
+gamma: 0.97        # drop the learning rate by a factor of 10
                   # (i.e., multiply it by a factor of gamma = 0.1)
 
-stepsize: 20  # drop the learning rate every 100K iterations
+stepsize: 100  # drop the learning rate every 100K iterations
 
-max_iter: 200  # train for 350K iterations total
+max_iter: 5000  # train for 350K iterations total
 
 display: 10
 momentum: 0.9

@@ -63,10 +63,10 @@ sample() {
     cd_proj
 
     # sample the training data, normalize and dump the normalization params to disk
-    python patch_sampler.py $DATAROOT/${EXPTNAME}/train --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc $SCALE_MFCC --x_len $TIMESLICE > $SAMPLELOG || fail
+    python patch_sampler.py $DATAROOT/${EXPTNAME}/train --x_len $TIMESLICE > $SAMPLELOG || fail
 
     # sample the dev data, normalize using the normalization params dumped during training
-    python patch_sampler.py $DATAROOT/${EXPTNAME}/dev --normalize_spec $DATAROOT/${EXPTNAME}/trained_normalization_params.pkl --scale_mfcc $SCALE_MFCC --x_len $TIMESLICE --dev >> $SAMPLELOG || fail
+    python patch_sampler.py $DATAROOT/${EXPTNAME}/dev --x_len $TIMESLICE >> $SAMPLELOG || fail
 }
 
 train() {
@@ -74,11 +74,11 @@ train() {
     cd_caffe
 
     cat project/cnn-speech-denoising/models/model0/${NET}.prototxt.template | \
-	python project/cnn-speech-denoising/replace.py "+TEST_DIR+" ${TESTDIR} | \
-	python project/cnn-speech-denoising/replace.py "+TRAIN_DIR+" ${TRAINDIR} > project/cnn-speech-denoising/models/model0/${EXPTNAME}.prototxt
+	python project/cnn-speech-denoising/replace.py "+TEST_DIR+",${TESTDIR} | \
+	python project/cnn-speech-denoising/replace.py "+TRAIN_DIR+",${TRAINDIR} > project/cnn-speech-denoising/models/model0/${EXPTNAME}.prototxt
 
     cat project/cnn-speech-denoising/models/model0/${NET}_solver.prototxt.template | \
-	python project/cnn-speech-denoising/replace.py "+EXPT_NAME+" ${EXPTNAME} > project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
+	python project/cnn-speech-denoising/replace.py "+EXPT_NAME+",${EXPTNAME} > project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt
 
     ./build/tools/caffe train \
         --solver=project/cnn-speech-denoising/models/model0/${EXPTNAME}_solver.prototxt  > $CAFFELOG 2>&1 || fail
